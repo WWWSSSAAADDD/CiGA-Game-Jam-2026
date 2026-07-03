@@ -1,0 +1,4 @@
+repository "CiGA Game Jam 2026@tj_wechat_os_qy07_8zlwasxlahzmze5sjiew@cloud.cn"
+  path "/"
+    br "/main"
+    co "/main"
