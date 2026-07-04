@@ -9,9 +9,9 @@ namespace Game.Gameplay.Anchor
     /// 状态机里唯一两条"主动控制代码"转移之一（另一条是碰撞触发锚定，走 AnchorController 自己的碰撞回调），
     /// 其余所有摆动/甩动都是物理引擎被动解算，这里不涉及。
     ///
-    /// 注意：在商店范围内，同一个空格键会先被 ShopTriggerZone 拦截去做"销毁结算"（见该类的
-    /// DefaultExecutionOrder 说明），这里的 ReleaseCurrentAsteroid() 到时候读到的锚已经是空的，
-    /// 单纯是个安全的空操作，不会重复处理，这个类本身不需要、也不应该知道商店的存在。
+    /// 注意：在商店范围内，空格键的"销毁结算"改由 ShopTriggerZone/CrusherController 接管——这里按下前
+    /// 先查询 AnchorController.IsShipInRange，为真就直接跳过，不会跟对方抢着处理同一次按键，
+    /// 这个判断不依赖两个订阅者谁先谁后，这个类本身也不需要、不应该知道商店的存在。
     /// </summary>
     [RequireComponent(typeof(AnchorController))]
     public class AnchorRelease : MonoBehaviour
@@ -39,6 +39,8 @@ namespace Game.Gameplay.Anchor
 
         private void HandleReleasePressed()
         {
+            if (anchor.IsShipInRange) return; // 商店范围内的销毁结算交给 ShopTriggerZone/CrusherController，这里不重复处理
+
             anchor.ReleaseCurrentAsteroid();
         }
     }

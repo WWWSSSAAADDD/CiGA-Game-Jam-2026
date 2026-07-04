@@ -8,17 +8,15 @@ namespace Game.Orchestration
 {
     /// <summary>
     /// 商店触发模块（编排层）。
-    /// 职责：用触发器维护"飞船是否在商店范围内"这个状态；范围内响应销毁键，命令粉碎商店结算；
+    /// 职责：用触发器维护"飞船是否在商店范围内"这个状态并同步给船锚；范围内响应销毁键，命令粉碎商店结算；
     /// 范围内响应开店键，切换商店页面 UI 面板的显示/隐藏；飞船离开范围时顺带把面板收起来，
     /// 避免玩家飞走了商店页面还开着。
     /// 不是商店本身——粉碎/结算/购买的实际逻辑都在 CrusherController 里，这里只负责"该不该触发/该不该显示"。
     ///
-    /// 用 <see cref="DefaultExecutionOrderAttribute"/> 把这个脚本的 Start（进而是事件订阅）排到
-    /// AnchorRelease 前面：空格键同时被 AnchorRelease（纯释放）和这里（范围内销毁结算）订阅，
-    /// C# 的 event 按订阅顺序依次调用，必须保证"先粉碎结算读到小行星、再释放"，否则顺序反了会导致
-    /// 小行星被 AnchorRelease 先一步脱锚、CrusherController.Open() 读到 null，白白脱锚不结算资源。
+    /// 空格键同时被 AnchorRelease（纯释放）和这里（范围内销毁结算）订阅，两边谁先响应都不影响正确性——
+    /// 靠的不是订阅顺序，而是这里把 shipInRange 状态通过 SetShipInRange() 命令同步给 AnchorController，
+    /// AnchorRelease 按键时会先查询这个状态自己决定要不要跳过。
     /// </summary>
-    [DefaultExecutionOrder(-10)]
     [RequireComponent(typeof(Collider2D))]
     public class ShopTriggerZone : MonoBehaviour
     {
@@ -57,7 +55,10 @@ namespace Game.Orchestration
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (other.GetComponent<ShipController>() != null)
+            {
                 shipInRange = true;
+                anchor?.SetShipInRange(true);
+            }
         }
 
         private void OnTriggerExit2D(Collider2D other)
@@ -65,6 +66,7 @@ namespace Game.Orchestration
             if (other.GetComponent<ShipController>() != null)
             {
                 shipInRange = false;
+                anchor?.SetShipInRange(false);
 
                 // 离开商店范围时顺带把面板收起来，避免飞走了商店页面还挂在屏幕上。
                 if (shopPanel != null)

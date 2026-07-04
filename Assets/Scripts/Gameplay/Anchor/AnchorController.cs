@@ -27,6 +27,10 @@ namespace Game.Gameplay.Anchor
         public Rigidbody2D AnchorRigidbody => anchorRigidbody;
         public AsteroidController AnchoredAsteroid => anchoredAsteroid;
 
+        /// <summary>查询：飞船当前是否在商店范围内。由 ShopTriggerZone 用 <see cref="SetShipInRange"/> 同步过来，
+        /// AnchorRelease 按空格释放前会先查这个值——在商店范围内时，销毁结算由商店那边接管，这里不重复触发纯释放。</summary>
+        public bool IsShipInRange { get; private set; }
+
         /// <summary>查询：当前拖拽的总质量。单锚版本最多同时拖一颗，没锚到东西时为 0。</summary>
         public float TotalDraggedMass => anchoredAsteroid != null ? anchoredAsteroid.Mass : 0f;
 
@@ -94,6 +98,12 @@ namespace Game.Gameplay.Anchor
             anchoredAsteroid = null;
             OnAsteroidReleased?.Invoke();
             return true;
+        }
+
+        /// <summary>命令：告知这个船锚"飞船当前是否在商店范围内"。调用方：ShopTriggerZone（进入/离开触发器时）。</summary>
+        public void SetShipInRange(bool inRange)
+        {
+            IsShipInRange = inRange;
         }
     }
 }

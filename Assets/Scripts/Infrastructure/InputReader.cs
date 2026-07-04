@@ -23,7 +23,8 @@ namespace Game.Infrastructure
 
         /// <summary>
         /// 空格键按下的瞬间触发一次——语义上对应"释放"：不在商店范围内时是纯释放锚（AnchorRelease 订阅）；
-        /// 在商店范围内时改为粉碎结算/销毁（ShopTriggerZone 订阅，且靠 DefaultExecutionOrder 保证它先处理）。
+        /// 在商店范围内时改为粉碎结算/销毁（ShopTriggerZone 订阅）。两边都会收到这个通知，
+        /// AnchorRelease 靠查询 AnchorController.IsShipInRange 自己决定要不要跳过，不依赖订阅顺序。
         /// </summary>
         public event Action OnReleasePressed;
 

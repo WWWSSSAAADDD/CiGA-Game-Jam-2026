@@ -78,7 +78,7 @@ namespace Game.Gameplay.Shop
             Inventory.Instance?.AddResource(payload.Type, payload.Amount);
 
             anchor.ReleaseCurrentAsteroid();
-            Destroy(asteroid.gameObject);
+            asteroid.Crush();
 
             OnCrushCompleted?.Invoke();
         }
