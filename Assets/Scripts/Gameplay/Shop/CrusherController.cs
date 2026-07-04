@@ -43,28 +43,18 @@ namespace Game.Gameplay.Shop
                 Instance = null;
         }
 
-        /// <summary>
-        /// 命令：粉碎指定船锚当前锚定的小行星，把资源结算进背包。
-        /// 调用方：商店触发模块（玩家进入商店范围且按下开店键时）。
-        /// 只结算资源，不自动应用任何效果卡——买卡是玩家在商店里的另一个主动操作，见 TryBuyCard()。
-        /// </summary>
-        public void Open(AnchorController anchor)
+        public void TryCrushAsteroid(AsteroidController asteroid)
         {
-            if (anchor == null) return;
-
-            AsteroidController asteroid = anchor.AnchoredAsteroid;
-            if (asteroid == null) return; // 链条上没有挂着小行星，没什么可粉碎的
-
+            if (asteroid == null) return;
+            
             ResourcePayload payload = asteroid.GetResourcePayload();
-            Inventory.Instance?.AddResource(payload.Type, payload.Amount);
-
-            anchor.ReleaseCurrentAsteroid();
-            Destroy(asteroid.gameObject);
-
+            Inventory.Instance?.AddResource(payload.Type, payload.Amount);  // 销毁小行星向背包添加资源
+            
+            // 先添加资源再销毁小行星，防止丢失引用
+            asteroid.CrushAsteroid();
+            
             OnCrushCompleted?.Invoke();
         }
-        
-        
         
         /// <summary>查询：商店目录里全部效果卡。调用方：商店购买界面（列出可买的卡）。</summary>
         public List<EffectCardData> GetAvailableCards()

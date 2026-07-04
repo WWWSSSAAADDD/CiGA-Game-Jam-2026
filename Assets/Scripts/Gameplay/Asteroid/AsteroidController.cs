@@ -1,3 +1,4 @@
+using Game.Gameplay.Anchor;
 using Game.Infrastructure;
 using UnityEngine;
 
@@ -36,7 +37,8 @@ namespace Game.Gameplay.Asteroid
         [SerializeField] private int resourceAmount = 10;
 
         private bool isAnchored;
-
+        private AnchorController anchorController;  // 之前锚定该小行星的船锚
+        
         public float Hardness => hardness;
         public float Mass => mass;
         public bool IsAnchored => isAnchored;
@@ -60,6 +62,7 @@ namespace Game.Gameplay.Asteroid
             joint.enableCollision = false;
 
             isAnchored = true;
+            anchorController = anchorRb.GetComponent<AnchorController>();
             return true;
         }
 
@@ -76,6 +79,18 @@ namespace Game.Gameplay.Asteroid
             return;
         }
 
+        public void CrushAsteroid()
+        {
+            // 更新船锚的状态
+            if (anchorController != null)
+            {
+                anchorController.ReleaseCurrentAsteroid();
+            }
+            
+            // 更新行星的状态
+            Destroy(gameObject);
+        }
+        
         /// <summary>查询：粉碎这颗小行星能拿到的资源载荷。</summary>
         public ResourcePayload GetResourcePayload()
         {
