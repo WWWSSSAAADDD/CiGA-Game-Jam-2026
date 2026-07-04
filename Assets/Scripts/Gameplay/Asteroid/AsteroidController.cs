@@ -92,7 +92,7 @@ namespace Game.Gameplay.Asteroid
         /// <summary>
         /// 命令：被商店粉碎。自己负责收尾（如果还锚着，先解除锚定）再销毁自己，调用方不需要
         /// 关心销毁前的清理细节——不管调用前是否已经 ReleaseAnchor() 过，这里都是安全的。
-        /// 调用方：CrusherController.Open()。
+        /// 调用方：CrusherController（CrushWithShip()/CrushWithoutShip() 内部共用的 CrushAndGrantResources()）。
         /// </summary>
         public void Crush()
         {

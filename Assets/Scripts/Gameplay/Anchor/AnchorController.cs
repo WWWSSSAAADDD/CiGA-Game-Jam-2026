@@ -27,11 +27,8 @@ namespace Game.Gameplay.Anchor
         public Rigidbody2D AnchorRigidbody => anchorRigidbody;
         public AsteroidController AnchoredAsteroid => anchoredAsteroid;
 
-        /// <summary>查询：飞船当前是否在商店范围内。由 ShopTriggerZone 用 <see cref="SetShipInRange"/> 同步过来，
-        /// AnchorRelease 按空格释放前会先查这个值——在商店范围内时，销毁结算由商店那边接管，这里不重复触发纯释放。</summary>
-        public bool IsShipInRange { get; private set; }
-
-        /// <summary>查询：当前拖拽的总质量。单锚版本最多同时拖一颗，没锚到东西时为 0。</summary>
+        /// <summary>查询：这一节自己拖拽的质量。单节最多同时拖一颗，没锚到东西时为 0。
+        /// 整条链的总拖拽质量由 AnchorChainController 汇总，这里只负责自己这一节。</summary>
         public float TotalDraggedMass => anchoredAsteroid != null ? anchoredAsteroid.Mass : 0f;
 
         /// <summary>通知：锚定成功。订阅方：UI 模块（显示扫描信息等）。</summary>
@@ -56,7 +53,13 @@ namespace Game.Gameplay.Anchor
         {
             if (shipRigidbody == null)
             {
-                Debug.LogWarning($"{nameof(AnchorController)} 没有指定 {nameof(shipRigidbody)}，船锚不会跟随飞船。");
+                // 链条非头节点故意留空 shipRigidbody（这一节靠 AnchorChainLink 的 DistanceJoint2D 连上一节，
+                // 不连船）——AnchorChainLink.SpawnNextLink() 会在这个物体的 Start() 跑之前就同步设好
+                // previousLink，所以这里能可靠地区分"这是链条节点"还是"真的漏配了"，避免非头节点每次都刷警告。
+                var chainLink = GetComponent<AnchorChainLink>();
+                if (chainLink == null || chainLink.PreviousLink == null)
+                    Debug.LogWarning($"{nameof(AnchorController)} 没有指定 {nameof(shipRigidbody)}，船锚不会跟随飞船。");
+
                 return;
             }
 
@@ -70,7 +73,7 @@ namespace Game.Gameplay.Anchor
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
-            if (anchoredAsteroid != null) return; // 单锚版本，已经锚着东西时不再判定新的碰撞
+            if (anchoredAsteroid != null) return; // 这一节已经锚着东西时不再判定新的碰撞（每节独立，最多同时拖一颗）
 
             var asteroid = collision.collider.GetComponent<AsteroidController>();
             if (asteroid == null) return;
@@ -88,7 +91,7 @@ namespace Game.Gameplay.Anchor
 
         /// <summary>
         /// 命令：释放当前锚定的小行星，恢复空载状态。
-        /// 调用方：AnchorRelease（玩家主动按键）；以后粉碎商店模块结算完也会复用这个方法。
+        /// 调用方：AnchorChainController（玩家主动按键，或商店粉碎结算完之后）。
         /// </summary>
         public bool ReleaseCurrentAsteroid()
         {
@@ -98,12 +101,6 @@ namespace Game.Gameplay.Anchor
             anchoredAsteroid = null;
             OnAsteroidReleased?.Invoke();
             return true;
-        }
-
-        /// <summary>命令：告知这个船锚"飞船当前是否在商店范围内"。调用方：ShopTriggerZone（进入/离开触发器时）。</summary>
-        public void SetShipInRange(bool inRange)
-        {
-            IsShipInRange = inRange;
         }
     }
 }

@@ -5,7 +5,6 @@ using Game.Gameplay.Asteroid;
 using Game.Gameplay.Ship;
 using Game.Infrastructure;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Game.Gameplay.Shop
 {
@@ -33,14 +32,17 @@ namespace Game.Gameplay.Shop
         [Header("商店/粉碎等级（当前阶段仅记录，暂无消费方）")]
         [SerializeField] private int crushLevel = 1;
         [SerializeField] private int shopLevel = 1;
-        
-        [FormerlySerializedAs("reCrushCooldown")]
-        [Header("粉碎小行星的CD")]
-        [SerializeField] private float recrushCooldown = 0.5f;
-        private float nextCrushAllowedTime;
-        
+
+        [Header("粉碎充能池：有上限的剩余可粉碎次数，每隔固定时间恢复 1 点，销毁一次扣 1 点")]
+        [SerializeField] private int maxCrushCharges = 5;
+        [SerializeField] private float chargeRegenInterval = 0.5f;
+        private int currentCrushCharges;
+        private float chargeRegenTimer;
+
         public int CrushLevel => crushLevel;
         public int ShopLevel => shopLevel;
+        public int CurrentCrushCharges => currentCrushCharges;
+        public int MaxCrushCharges => maxCrushCharges;
 
         /// <summary>通知：完成一次粉碎结算。订阅方：小行星生成模块（用来推进难度曲线）。</summary>
         public event Action OnCrushCompleted;
@@ -55,11 +57,23 @@ namespace Game.Gameplay.Shop
             }
 
             Instance = this;
+            currentCrushCharges = maxCrushCharges;
 
             if (shipStats == null)
                 Debug.LogWarning($"{nameof(CrusherController)} 没有指定 {nameof(shipStats)}，购买飞船相关的效果卡会静默不生效。");
             if (anchorStats == null)
                 Debug.LogWarning($"{nameof(CrusherController)} 没有指定 {nameof(anchorStats)}，购买船锚相关的效果卡会静默不生效。");
+        }
+
+        private void Update()
+        {
+            if (currentCrushCharges >= maxCrushCharges) return;
+
+            chargeRegenTimer += Time.deltaTime;
+            if (chargeRegenTimer < chargeRegenInterval) return;
+
+            chargeRegenTimer = 0f;
+            currentCrushCharges++;
         }
 
         private void OnDestroy()
@@ -73,31 +87,46 @@ namespace Game.Gameplay.Shop
         /// 调用方：商店触发模块（玩家进入商店范围且按下开店键时）。
         /// 只结算资源，不自动应用任何效果卡——买卡是玩家在商店里的另一个主动操作，见 TryBuyCard()。
         /// </summary>
-        public void CrushWithShip(AnchorController anchor)
+        public bool CrushWithShip(AnchorController anchor)
         {
-            if (Time.time < nextCrushAllowedTime) return;
-            
-            if (anchor == null) return;
-            
+            if (currentCrushCharges < 1) return false;
+
+            if (anchor == null) return false;
+
             AsteroidController asteroid = anchor.AnchoredAsteroid;
-            if (asteroid == null) return; // 链条上没有挂着小行星，没什么可粉碎的
-            CrushWithoutShip(asteroid);
-            
+            if (asteroid == null) return false; // 链条上没有挂着小行星，没什么可粉碎的
+
+            // 注意：这里不能走 CrushWithoutShip()——那边专门守着"必须是未锚定状态"，
+            // 而这里的小行星此刻恰恰还锚在船锚上，直接调用会被那道门槛拦下，
+            // 变成"白放（不结算资源、不扣充能）"。销毁+结算的实际操作走共用的 CrushAndGrantResources()。
             anchor.ReleaseCurrentAsteroid();
+            CrushAndGrantResources(asteroid);
+            return true;
         }
 
-        public void CrushWithoutShip(AsteroidController asteriod)
+        /// <summary>
+        /// 命令：粉碎任意一颗未被锚定的小行星（通常是漂进商店范围、没人拖着的），把资源结算进背包。
+        /// 调用方：商店触发模块（`OnTriggerEnter2D` 检测到未锚定的小行星进入范围时）。
+        /// </summary>
+        public void CrushWithoutShip(AsteroidController asteroid)
         {
-            if (Time.time < nextCrushAllowedTime) return;
-            
+            if (currentCrushCharges < 1) return;
+
             // 如果是小行星，且小行星处于非锚定状态，则可以Crush
-            if (asteriod == null || asteriod.IsAnchored) return;
-            asteriod.Crush();
-            
+            if (asteroid == null || asteroid.IsAnchored) return;
+
+            CrushAndGrantResources(asteroid);
+        }
+
+        // 实际执行销毁 + 资源结算 + 扣充能 + 广播通知，CrushWithShip()/CrushWithoutShip() 两个入口共用。
+        private void CrushAndGrantResources(AsteroidController asteroid)
+        {
+            ResourcePayload payload = asteroid.GetResourcePayload();
+
+            asteroid.Crush();
             OnCrushCompleted?.Invoke();
-            
-            nextCrushAllowedTime = Time.time + recrushCooldown;
-            ResourcePayload payload = asteriod.GetResourcePayload();
+
+            currentCrushCharges--;
             Inventory.Instance?.AddResource(payload.Type, payload.Amount);
         }
         

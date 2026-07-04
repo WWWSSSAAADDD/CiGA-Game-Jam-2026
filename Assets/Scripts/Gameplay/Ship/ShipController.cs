@@ -11,14 +11,15 @@ namespace Game.Gameplay.Ship
     ///
     /// 通信方式：
     ///   - 查询 InputReader.Instance.MoveInput 得到移动方向；
-    ///   - 查询 <see cref="DraggedMass"/>，即船锚当前拖拽的总质量。
+    ///   - 查询 <see cref="DraggedMass"/>，即整条船锚链当前拖拽的总质量。
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(ShipStats))]
     public class ShipController : MonoBehaviour
     {
-        [Tooltip("Inspector 里拖同一艘飞船挂着的船锚物体进来，用来查询当前拖拽质量。留空则视为拖拽质量恒为 0。")]
-        [SerializeField] private AnchorController anchor;
+        [Tooltip("Inspector 里拖同一艘飞船挂着的船锚链条控制器进来（链条头一节上的 AnchorChainController），" +
+                 "用来查询当前拖拽质量（自动覆盖整条链）。留空则视为拖拽质量恒为 0。")]
+        [SerializeField] private AnchorChainController anchorChain;
 
         private Rigidbody2D rb;
         private ShipStats stats;
@@ -51,8 +52,8 @@ namespace Game.Gameplay.Ship
             rb.mass = stats.Mass;
         }
 
-        /// <summary>拖拽质量查询：转发船锚当前拖拽的总质量；没连船锚时视为 0。</summary>
-        private float DraggedMass => anchor != null ? anchor.TotalDraggedMass : 0f;
+        /// <summary>拖拽质量查询：转发整条船锚链当前拖拽的总质量；没连船锚链时视为 0。</summary>
+        private float DraggedMass => anchorChain != null ? anchorChain.TotalDraggedMass : 0f;
 
         private void FixedUpdate()
         {
