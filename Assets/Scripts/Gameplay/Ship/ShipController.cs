@@ -62,6 +62,8 @@ namespace Game.Gameplay.Ship
             if (input.sqrMagnitude > 1f)
                 input.Normalize();
 
+            if (rb.velocity.magnitude >= stats.MaxSpeed) return;
+            
             // 实际加速度 = 推力 /（飞船质量 + 拖拽质量），拖得越重、加速越慢。
             float totalMass = Mathf.Max(0.0001f, stats.Mass + DraggedMass);
             Vector2 acceleration = input * (stats.Thrust / totalMass);
