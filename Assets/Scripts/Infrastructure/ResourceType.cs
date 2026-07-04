@@ -6,6 +6,7 @@ namespace Game.Infrastructure
     /// </summary>
     public enum ResourceType
     {
+        Gold,
         Metal,
         Ice,
         Crystal
