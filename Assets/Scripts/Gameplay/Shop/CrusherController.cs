@@ -5,6 +5,7 @@ using Game.Gameplay.Asteroid;
 using Game.Gameplay.Ship;
 using Game.Infrastructure;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Game.Gameplay.Shop
 {
@@ -32,7 +33,12 @@ namespace Game.Gameplay.Shop
         [Header("商店/粉碎等级（当前阶段仅记录，暂无消费方）")]
         [SerializeField] private int crushLevel = 1;
         [SerializeField] private int shopLevel = 1;
-
+        
+        [FormerlySerializedAs("reCrushCooldown")]
+        [Header("粉碎小行星的CD")]
+        [SerializeField] private float recrushCooldown = 0.5f;
+        private float nextCrushAllowedTime;
+        
         public int CrushLevel => crushLevel;
         public int ShopLevel => shopLevel;
 
@@ -69,6 +75,8 @@ namespace Game.Gameplay.Shop
         /// </summary>
         public void Open(AnchorController anchor)
         {
+            if (Time.time < nextCrushAllowedTime) return;
+            
             if (anchor == null) return;
 
             AsteroidController asteroid = anchor.AnchoredAsteroid;
@@ -81,6 +89,8 @@ namespace Game.Gameplay.Shop
             asteroid.Crush();
 
             OnCrushCompleted?.Invoke();
+            
+            nextCrushAllowedTime = Time.time + recrushCooldown;
         }
 
         /// <summary>查询：商店目录里全部效果卡。调用方：商店购买界面（列出可买的卡）。</summary>
