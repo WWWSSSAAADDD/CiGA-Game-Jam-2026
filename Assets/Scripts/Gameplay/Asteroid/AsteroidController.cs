@@ -33,7 +33,7 @@ namespace Game.Gameplay.Asteroid
         [SerializeField] private float mass = 1f;
         [Tooltip("被释放后，必须等待多少秒才允许再次被船锚锚定。")]
         [Min(0f)]
-        [SerializeField] private float reanchorCooldown = 0.5f;
+        [SerializeField] private float reanchorCooldown = 1f;
 
         [Header("资源")]
         [SerializeField] private ResourceType resourceType;

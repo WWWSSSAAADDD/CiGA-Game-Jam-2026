@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 2218045348412833207}
   m_Layer: 0
   m_Name: Asteroid
-  m_TagString: Untagged
+  m_TagString: Asteroid
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,6 +163,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hardness: 3
   mass: 1
-  reanchorCooldown: 0.5
+  reanchorCooldown: 1
   resourceType: 0
   resourceAmount: 10

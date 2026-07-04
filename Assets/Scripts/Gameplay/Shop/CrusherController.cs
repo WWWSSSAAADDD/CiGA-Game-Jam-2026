@@ -73,26 +73,34 @@ namespace Game.Gameplay.Shop
         /// 调用方：商店触发模块（玩家进入商店范围且按下开店键时）。
         /// 只结算资源，不自动应用任何效果卡——买卡是玩家在商店里的另一个主动操作，见 TryBuyCard()。
         /// </summary>
-        public void Open(AnchorController anchor)
+        public void CrushWithShip(AnchorController anchor)
         {
             if (Time.time < nextCrushAllowedTime) return;
             
             if (anchor == null) return;
-
+            
             AsteroidController asteroid = anchor.AnchoredAsteroid;
             if (asteroid == null) return; // 链条上没有挂着小行星，没什么可粉碎的
-
-            ResourcePayload payload = asteroid.GetResourcePayload();
-            Inventory.Instance?.AddResource(payload.Type, payload.Amount);
-
+            CrushWithoutShip(asteroid);
+            
             anchor.ReleaseCurrentAsteroid();
-            asteroid.Crush();
+        }
 
+        public void CrushWithoutShip(AsteroidController asteriod)
+        {
+            if (Time.time < nextCrushAllowedTime) return;
+            
+            // 如果是小行星，且小行星处于非锚定状态，则可以Crush
+            if (asteriod == null || asteriod.IsAnchored) return;
+            asteriod.Crush();
+            
             OnCrushCompleted?.Invoke();
             
             nextCrushAllowedTime = Time.time + recrushCooldown;
+            ResourcePayload payload = asteriod.GetResourcePayload();
+            Inventory.Instance?.AddResource(payload.Type, payload.Amount);
         }
-
+        
         /// <summary>查询：商店目录里全部效果卡。调用方：商店购买界面（列出可买的卡）。</summary>
         public List<EffectCardData> GetAvailableCards()
         {

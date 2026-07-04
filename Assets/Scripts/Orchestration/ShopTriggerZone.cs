@@ -1,4 +1,5 @@
 using Game.Gameplay.Anchor;
+using Game.Gameplay.Asteroid;
 using Game.Gameplay.Shop;
 using Game.Gameplay.Ship;
 using Game.Infrastructure;
@@ -31,7 +32,7 @@ namespace Game.Orchestration
 
         // 挂这个脚本的 Collider2D 需要在 Inspector 里勾上 isTrigger，否则 OnTriggerEnter2D/Exit2D 不会触发。
         private bool shipInRange;
-
+        
         private void Start()
         {
             // 用 Start（而不是 OnEnable）订阅跨物体的单例事件：Unity 不保证不同物体的 Awake 先后顺序，
@@ -59,6 +60,11 @@ namespace Game.Orchestration
                 shipInRange = true;
                 anchor?.SetShipInRange(true);
             }
+
+            if (other.TryGetComponent(out AsteroidController asteroid))
+            {
+                CrusherController.Instance?.CrushWithoutShip(asteroid);
+            }
         }
 
         private void OnTriggerExit2D(Collider2D other)
@@ -79,7 +85,7 @@ namespace Game.Orchestration
         {
             if (!shipInRange) return;
 
-            CrusherController.Instance?.Open(anchor);
+            CrusherController.Instance?.CrushWithShip(anchor);
         }
 
         /// <summary>M 键：范围内切换商店页面的显示/隐藏。</summary>
