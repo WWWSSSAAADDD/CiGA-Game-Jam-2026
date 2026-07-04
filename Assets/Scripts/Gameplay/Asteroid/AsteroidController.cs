@@ -36,6 +36,8 @@ namespace Game.Gameplay.Asteroid
         [SerializeField] private ResourceType resourceType;
         [SerializeField] private int resourceAmount = 10;
 
+        [SerializeField] private float reanchoredAllowedTime = 1;
+        
         private bool isAnchored;
         private AnchorController anchorController;  // 之前锚定该小行星的船锚
         private float nextAnchorAllowedTime;
@@ -48,15 +50,12 @@ namespace Game.Gameplay.Asteroid
         {
             GetComponent<Rigidbody2D>().mass = mass;
         }
-
-        /// <summary>
-        /// 命令：尝试被船锚锚定。调用方（AnchorController）负责先判定穿透强度/速度是否够，
-        /// 这里只处理"锚定"这个动作本身：挂一个 FixedJoint2D 连到锚的刚体上。
-        /// </summary>
+        
         public bool TryAnchor(Rigidbody2D anchorRb)
         {
             if (isAnchored) return false;
-
+            if (Time.time < nextAnchorAllowedTime) return false;
+            
             var joint = gameObject.AddComponent<FixedJoint2D>();
             joint.connectedBody = anchorRb;
             joint.autoConfigureConnectedAnchor = true;
@@ -77,6 +76,7 @@ namespace Game.Gameplay.Asteroid
                 Destroy(joint);
 
             isAnchored = false;
+            nextAnchorAllowedTime = Time.time + reanchoredAllowedTime;
             return;
         }
 
