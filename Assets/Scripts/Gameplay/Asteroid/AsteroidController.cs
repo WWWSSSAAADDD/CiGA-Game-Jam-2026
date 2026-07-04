@@ -38,6 +38,7 @@ namespace Game.Gameplay.Asteroid
 
         private bool isAnchored;
         private AnchorController anchorController;  // 之前锚定该小行星的船锚
+        private float nextAnchorAllowedTime;
         
         public float Hardness => hardness;
         public float Mass => mass;
