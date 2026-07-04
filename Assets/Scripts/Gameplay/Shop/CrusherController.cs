@@ -33,8 +33,16 @@ namespace Game.Gameplay.Shop
         [SerializeField] private int crushLevel = 1;
         [SerializeField] private int shopLevel = 1;
 
+        [Header("粉碎充能池：有上限的剩余可粉碎次数，每隔固定时间恢复 1 点，销毁一次扣 1 点")]
+        [SerializeField] private int maxCrushCharges = 5;
+        [SerializeField] private float chargeRegenInterval = 0.5f;
+        private int currentCrushCharges;
+        private float chargeRegenTimer;
+
         public int CrushLevel => crushLevel;
         public int ShopLevel => shopLevel;
+        public int CurrentCrushCharges => currentCrushCharges;
+        public int MaxCrushCharges => maxCrushCharges;
 
         /// <summary>通知：完成一次粉碎结算。订阅方：小行星生成模块（用来推进难度曲线）。</summary>
         public event Action OnCrushCompleted;
@@ -49,11 +57,23 @@ namespace Game.Gameplay.Shop
             }
 
             Instance = this;
+            currentCrushCharges = maxCrushCharges;
 
             if (shipStats == null)
                 Debug.LogWarning($"{nameof(CrusherController)} 没有指定 {nameof(shipStats)}，购买飞船相关的效果卡会静默不生效。");
             if (anchorStats == null)
                 Debug.LogWarning($"{nameof(CrusherController)} 没有指定 {nameof(anchorStats)}，购买船锚相关的效果卡会静默不生效。");
+        }
+
+        private void Update()
+        {
+            if (currentCrushCharges >= maxCrushCharges) return;
+
+            chargeRegenTimer += Time.deltaTime;
+            if (chargeRegenTimer < chargeRegenInterval) return;
+
+            chargeRegenTimer = 0f;
+            currentCrushCharges++;
         }
 
         private void OnDestroy()
@@ -67,22 +87,49 @@ namespace Game.Gameplay.Shop
         /// 调用方：商店触发模块（玩家进入商店范围且按下开店键时）。
         /// 只结算资源，不自动应用任何效果卡——买卡是玩家在商店里的另一个主动操作，见 TryBuyCard()。
         /// </summary>
-        public void Open(AnchorController anchor)
+        public bool CrushWithShip(AnchorController anchor)
         {
-            if (anchor == null) return;
+            if (currentCrushCharges < 1) return false;
+
+            if (anchor == null) return false;
 
             AsteroidController asteroid = anchor.AnchoredAsteroid;
-            if (asteroid == null) return; // 链条上没有挂着小行星，没什么可粉碎的
+            if (asteroid == null) return false; // 链条上没有挂着小行星，没什么可粉碎的
 
-            ResourcePayload payload = asteroid.GetResourcePayload();
-            Inventory.Instance?.AddResource(payload.Type, payload.Amount);
-
+            // 注意：这里不能走 CrushWithoutShip()——那边专门守着"必须是未锚定状态"，
+            // 而这里的小行星此刻恰恰还锚在船锚上，直接调用会被那道门槛拦下，
+            // 变成"白放（不结算资源、不扣充能）"。销毁+结算的实际操作走共用的 CrushAndGrantResources()。
             anchor.ReleaseCurrentAsteroid();
-            asteroid.Crush();
-
-            OnCrushCompleted?.Invoke();
+            CrushAndGrantResources(asteroid);
+            return true;
         }
 
+        /// <summary>
+        /// 命令：粉碎任意一颗未被锚定的小行星（通常是漂进商店范围、没人拖着的），把资源结算进背包。
+        /// 调用方：商店触发模块（`OnTriggerEnter2D` 检测到未锚定的小行星进入范围时）。
+        /// </summary>
+        public void CrushWithoutShip(AsteroidController asteroid)
+        {
+            if (currentCrushCharges < 1) return;
+
+            // 如果是小行星，且小行星处于非锚定状态，则可以Crush
+            if (asteroid == null || asteroid.IsAnchored) return;
+
+            CrushAndGrantResources(asteroid);
+        }
+
+        // 实际执行销毁 + 资源结算 + 扣充能 + 广播通知，CrushWithShip()/CrushWithoutShip() 两个入口共用。
+        private void CrushAndGrantResources(AsteroidController asteroid)
+        {
+            ResourcePayload payload = asteroid.GetResourcePayload();
+
+            asteroid.Crush();
+            OnCrushCompleted?.Invoke();
+
+            currentCrushCharges--;
+            Inventory.Instance?.AddResource(payload.Type, payload.Amount);
+        }
+        
         /// <summary>查询：商店目录里全部效果卡。调用方：商店购买界面（列出可买的卡）。</summary>
         public List<EffectCardData> GetAvailableCards()
         {

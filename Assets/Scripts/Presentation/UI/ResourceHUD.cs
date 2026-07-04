@@ -12,6 +12,7 @@ namespace Game.Presentation.UI
     public class ResourceHUD : MonoBehaviour
     {
         [Header("三种资源各自的文本控件")]
+        [SerializeField] private TextMeshProUGUI goldText;
         [SerializeField] private TextMeshProUGUI metalText;
         [SerializeField] private TextMeshProUGUI iceText;
         [SerializeField] private TextMeshProUGUI crystalText;
@@ -25,6 +26,7 @@ namespace Game.Presentation.UI
                 Inventory.Instance.OnResourceChanged += HandleResourceChanged;
 
                 // 事件只在数值变化时触发，进场时先主动查一次当前值，避免开局文本一直显示初始占位符。
+                RefreshLabel(ResourceType.Gold, Inventory.Instance.GetResourceAmount(ResourceType.Gold));
                 RefreshLabel(ResourceType.Metal, Inventory.Instance.GetResourceAmount(ResourceType.Metal));
                 RefreshLabel(ResourceType.Ice, Inventory.Instance.GetResourceAmount(ResourceType.Ice));
                 RefreshLabel(ResourceType.Crystal, Inventory.Instance.GetResourceAmount(ResourceType.Crystal));
@@ -46,6 +48,9 @@ namespace Game.Presentation.UI
         {
             switch (type)
             {
+                case ResourceType.Gold:
+                    if (goldText != null) goldText.text = amount.ToString();
+                    break;
                 case ResourceType.Metal:
                     if (metalText != null) metalText.text = amount.ToString();
                     break;
