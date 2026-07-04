@@ -39,13 +39,9 @@ namespace Game.Gameplay.Anchor
         public float MinAnchorSpeed => minAnchorSpeed;
         public float Mass => mass;
         public float ChainLength => chainLength;
-        public int HeadCount => headCount;
-
-        /// <summary>数值变化通知（升级生效后）。订阅方：任何需要感知船锚数值变化的模块。</summary>
-        public event Action OnStatsChanged;
 
         /// <summary>命令：应用一次升级（粉碎商店结算时调用）。内部改完值后自己广播 OnStatsChanged。</summary>
-        public void ApplyUpgrade(AnchorUpgradeType type, float delta)
+        internal void ApplyUpgrade(AnchorUpgradeType type, float delta)
         {
             switch (type)
             {
@@ -65,8 +61,6 @@ namespace Game.Gameplay.Anchor
                     headCount = Mathf.Max(1, headCount + Mathf.RoundToInt(delta));
                     break;
             }
-
-            OnStatsChanged?.Invoke();
         }
     }
 }

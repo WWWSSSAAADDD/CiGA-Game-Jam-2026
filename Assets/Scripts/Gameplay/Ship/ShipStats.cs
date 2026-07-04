@@ -60,7 +60,7 @@ namespace Game.Gameplay.Ship
         }
 
         /// <summary>命令：应用一次升级（粉碎商店升级飞船时时调用）。内部改完值后自己广播 OnStatsChanged。</summary>
-        public void ApplyUpgrade(ShipUpgradeType type, float delta)
+        internal void ApplyUpgrade(ShipUpgradeType type, float delta)
         {
             switch (type)
             {

@@ -52,7 +52,7 @@ namespace Game.Gameplay.Ship
         }
 
         /// <summary>拖拽质量查询：转发船锚当前拖拽的总质量；没连船锚时视为 0。</summary>
-        private float DraggedMass => anchor != null ? anchor.TotalDraggedMass : 0f;
+        private float DraggedMass => anchor != null ? anchor.TotalMass : 0f;
 
         private void FixedUpdate()
         {
@@ -70,6 +70,11 @@ namespace Game.Gameplay.Ship
             // 这里乘回 rb.mass 抵消掉，使最终产生的加速度精确等于上面算出的 acceleration，
             // 不受 rb.mass 实际取值影响（即便以后 rb.mass 和 stats.Mass 不同步也不会算错）。
             rb.AddForce(acceleration * rb.mass, ForceMode2D.Force);
+        }
+
+        public void ApplyUpgrade(ShipUpgradeType type, float delta)
+        {
+            stats.ApplyUpgrade(type, delta);
         }
     }
 }

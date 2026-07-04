@@ -18,42 +18,23 @@ namespace Game.Gameplay.Shop
     public class CrusherController : MonoBehaviour
     {
         public static CrusherController Instance { get; private set; }
-
+        
         [Header("升级结算目标")]
-        [Tooltip("Inspector 里拖飞船的 ShipStats 进来，玩家购买效果卡后给飞船结算升级用。")]
-        [SerializeField] private ShipStats shipStats;
-        [Tooltip("Inspector 里拖船锚的 AnchorStats 进来，玩家购买效果卡后给船锚结算升级用。")]
-        [SerializeField] private AnchorStats anchorStats;
-
+        [Tooltip("Inspector 里拖飞船的 shipController 进来，玩家购买效果卡后给飞船结算升级用。")]
+        [SerializeField] private ShipController shipController;
+        [Tooltip("Inspector 里拖船锚的 anchorController 进来，玩家购买效果卡后给船锚结算升级用。")]
+        [SerializeField] private AnchorController anchorController;
+        
         [Header("效果卡配置表")]
         [Tooltip("Inspector 里拖效果卡数据库资产进来，构成商店里能买到的卡片目录。")]
         [SerializeField] private EffectCardDatabase effectCardDatabase;
-
-        [Header("商店/粉碎等级（当前阶段仅记录，暂无消费方）")]
-        [SerializeField] private int crushLevel = 1;
-        [SerializeField] private int shopLevel = 1;
-
-        public int CrushLevel => crushLevel;
-        public int ShopLevel => shopLevel;
-
+        
         /// <summary>通知：完成一次粉碎结算。订阅方：小行星生成模块（用来推进难度曲线）。</summary>
         public event Action OnCrushCompleted;
 
         private void Awake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Debug.LogWarning($"{nameof(CrusherController)} 已存在一份单例实例，销毁多余的一份组件：{gameObject.name}");
-                Destroy(this);
-                return;
-            }
-
             Instance = this;
-
-            if (shipStats == null)
-                Debug.LogWarning($"{nameof(CrusherController)} 没有指定 {nameof(shipStats)}，购买飞船相关的效果卡会静默不生效。");
-            if (anchorStats == null)
-                Debug.LogWarning($"{nameof(CrusherController)} 没有指定 {nameof(anchorStats)}，购买船锚相关的效果卡会静默不生效。");
         }
 
         private void OnDestroy()
@@ -83,6 +64,10 @@ namespace Game.Gameplay.Shop
             OnCrushCompleted?.Invoke();
         }
 
+        
+        
+        
+        
         /// <summary>查询：商店目录里全部效果卡。调用方：商店购买界面（列出可买的卡）。</summary>
         public List<EffectCardData> GetAvailableCards()
         {
@@ -116,31 +101,31 @@ namespace Game.Gameplay.Shop
             switch (card.StatType)
             {
                 case EffectStatType.ShipThrust:
-                    shipStats?.ApplyUpgrade(ShipUpgradeType.Thrust, card.Delta);
+                    shipController?.ApplyUpgrade(ShipUpgradeType.Thrust, card.Delta);
                     break;
                 case EffectStatType.ShipMaxHealth:
-                    shipStats?.ApplyUpgrade(ShipUpgradeType.MaxHealth, card.Delta);
+                    shipController?.ApplyUpgrade(ShipUpgradeType.MaxHealth, card.Delta);
                     break;
                 case EffectStatType.ShipMaxEnergy:
-                    shipStats?.ApplyUpgrade(ShipUpgradeType.MaxEnergy, card.Delta);
+                    shipController?.ApplyUpgrade(ShipUpgradeType.MaxEnergy, card.Delta);
                     break;
                 case EffectStatType.ShipMass:
-                    shipStats?.ApplyUpgrade(ShipUpgradeType.Mass, card.Delta);
+                    shipController?.ApplyUpgrade(ShipUpgradeType.Mass, card.Delta);
                     break;
                 case EffectStatType.AnchorPenetration:
-                    anchorStats?.ApplyUpgrade(AnchorUpgradeType.Penetration, card.Delta);
+                    anchorController?.ApplyUpgrade(AnchorUpgradeType.Penetration, card.Delta);
                     break;
                 case EffectStatType.AnchorMinSpeed:
-                    anchorStats?.ApplyUpgrade(AnchorUpgradeType.MinAnchorSpeed, card.Delta);
+                    anchorController?.ApplyUpgrade(AnchorUpgradeType.MinAnchorSpeed, card.Delta);
                     break;
                 case EffectStatType.AnchorMass:
-                    anchorStats?.ApplyUpgrade(AnchorUpgradeType.Mass, card.Delta);
+                    anchorController?.ApplyUpgrade(AnchorUpgradeType.Mass, card.Delta);
                     break;
                 case EffectStatType.AnchorChainLength:
-                    anchorStats?.ApplyUpgrade(AnchorUpgradeType.ChainLength, card.Delta);
+                    anchorController?.ApplyUpgrade(AnchorUpgradeType.ChainLength, card.Delta);
                     break;
                 case EffectStatType.AnchorHeadCount:
-                    anchorStats?.ApplyUpgrade(AnchorUpgradeType.HeadCount, card.Delta);
+                    anchorController?.ApplyUpgrade(AnchorUpgradeType.HeadCount, card.Delta);
                     break;
                 default:
                     Debug.LogWarning($"{nameof(CrusherController)} 遇到了没有翻译规则的 {nameof(EffectStatType)}：{card.StatType}");

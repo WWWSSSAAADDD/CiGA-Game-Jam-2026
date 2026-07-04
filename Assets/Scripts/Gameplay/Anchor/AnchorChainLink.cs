@@ -27,22 +27,13 @@ namespace Game.Gameplay.Anchor
         [SerializeField] private float chainLinkLength = 2f;
 
         private Rigidbody2D selfRigidbody;
-        private AnchorChainLink previousLink;
-
-        /// <summary>查询：上一节链条；链条头一节（直接连船的那一节）没有上一节，值为 null。</summary>
-        public AnchorChainLink PreviousLink => previousLink;
-
+        
         private void Awake()
         {
             selfRigidbody = GetComponent<Rigidbody2D>();
         }
-
-        /// <summary>
-        /// 命令：在链条末端动态生成下一节新锚，并创建这一节到下一节之间的绳子视觉。
-        /// 调用方：需要延长链条时（具体触发时机——比如某项升级解锁额外锚头——留给未来的编排逻辑决定，
-        /// 这里只提供"生成下一节"这个能力本身）。
-        /// </summary>
-        public AnchorChainLink SpawnNextLink(Vector2 spawnPosition)
+        
+        internal AnchorController SpawnNextAnchor(Vector2 spawnPosition)
         {
             GameObject spawned = Instantiate(anchorPrefab, spawnPosition, Quaternion.identity);
             AnchorChainLink nextLink = spawned.GetComponent<AnchorChainLink>();
@@ -53,15 +44,16 @@ namespace Game.Gameplay.Anchor
             joint.enableCollision = false;
             joint.autoConfigureDistance = false; // 必须在设置 distance 之前关闭，否则 Unity 会用实际生成间距覆盖 chainLinkLength
             joint.distance = chainLinkLength;
-
-            nextLink.previousLink = this;
+            
 
             // 这一段绳子视觉的生命周期跟这一节锚绑在一起，谁创建谁负责设两个端点。
             RopeVisual rope = Instantiate(ropeVisualPrefab).GetComponent<RopeVisual>();
             rope.PointA = transform;
             rope.PointB = nextLink.transform;
 
-            return nextLink;
+            AnchorController  anchorController = spawned.GetComponent<AnchorController>();
+            anchorController.setIsFirstAnchor(false);
+            return anchorController;
         }
     }
 }

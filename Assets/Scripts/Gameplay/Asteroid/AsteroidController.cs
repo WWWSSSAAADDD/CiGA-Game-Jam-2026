@@ -64,16 +64,16 @@ namespace Game.Gameplay.Asteroid
         }
 
         /// <summary>命令：解除锚定，销毁挂在自己身上的 FixedJoint2D，恢复自由飘浮状态。</summary>
-        public bool ReleaseAnchor()
+        public void ReleaseAnchor()
         {
-            if (!isAnchored) return false;
+            if (!isAnchored) return;
 
             var joint = GetComponent<FixedJoint2D>();
             if (joint != null)
                 Destroy(joint);
 
             isAnchored = false;
-            return true;
+            return;
         }
 
         /// <summary>查询：粉碎这颗小行星能拿到的资源载荷。</summary>
