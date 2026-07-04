@@ -6,12 +6,7 @@ namespace Game.Gameplay.Ship
 {
     /// <summary>
     /// 飞船模块 —— 行为部分（核心玩法层）。
-    /// 职责：读输入、AddForce 推动飞船。数值只读同物体上的 ShipStats（GetComponent），
-    /// 不自己存推力/质量这些数值（XxxController + XxxStats 拆分模式）。
-    ///
-    /// 通信方式：
-    ///   - 查询 InputReader.Instance.MoveInput 得到移动方向；
-    ///   - 查询 <see cref="DraggedMass"/>，即船锚当前拖拽的总质量。
+    /// 职责：任何外部模块与Ship模块交互，都通过ShipController接口
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(ShipStats))]
@@ -62,13 +57,11 @@ namespace Game.Gameplay.Ship
             if (input.sqrMagnitude > 1f)
                 input.Normalize();
 
+            if (rb.velocity.magnitude >= stats.MaxSpeed) return;
+            
             // 实际加速度 = 推力 /（飞船质量 + 拖拽质量），拖得越重、加速越慢。
             float totalMass = Mathf.Max(0.0001f, stats.Mass + DraggedMass);
             Vector2 acceleration = input * (stats.Thrust / totalMass);
-
-            // Rigidbody2D.AddForce(ForceMode2D.Force) 内部会再除一次 rb.mass，
-            // 这里乘回 rb.mass 抵消掉，使最终产生的加速度精确等于上面算出的 acceleration，
-            // 不受 rb.mass 实际取值影响（即便以后 rb.mass 和 stats.Mass 不同步也不会算错）。
             rb.AddForce(acceleration * rb.mass, ForceMode2D.Force);
         }
 

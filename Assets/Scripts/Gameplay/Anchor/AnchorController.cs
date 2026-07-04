@@ -7,11 +7,7 @@ namespace Game.Gameplay.Anchor
 {
     /// <summary>
     /// 船锚模块 —— 行为部分（核心玩法层）。
-    /// 职责：
-    ///   - 启动时挂一根连到飞船的 DistanceJoint2D（maxDistanceOnly，只做最大距离约束），
-    ///     之后船锚的所有摆动/甩动完全交给物理引擎解算，这里不写一行运动学代码。
-    ///   - 碰撞时判定"穿透强度是否够、速度是否够"，够就命令小行星侧的 TryAnchor()。
-    ///   - 暴露当前拖拽质量查询，供飞船模块计算加速度。
+    /// 职责：任何外部模块与Anchor模块交互，都通过AnchorController接口
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     [RequireComponent(typeof(Collider2D))]
@@ -52,16 +48,15 @@ namespace Game.Gameplay.Anchor
 
         private void Start()
         {
-            // TODO: 检查rb的mass
             anchorRigidbody.mass = anchorStats.Mass;
 
             if (!isFirstAnchor) return;
             if (InputReader.Instance != null)
             {
-                InputReader.Instance.OnReleasePressed += ReleaseCurrentAsteroid;
-                //InputReader.Instance.OnUseItemPressed += SpawnNextAnchor;
+                InputReader.Instance.OnReleasePressed += ReleaseLastAsteroid;
             }
             SetupShipJoint();
+            anchorStats.OnHeadCountChanged += HandleHeadCountChanged;
         }
 
         private void OnDestroy()
@@ -69,9 +64,9 @@ namespace Game.Gameplay.Anchor
             if (!isFirstAnchor) return;
             if (InputReader.Instance != null)
             {
-                InputReader.Instance.OnReleasePressed -= ReleaseCurrentAsteroid;
-                //InputReader.Instance.OnUseItemPressed -= SpawnNextAnchor;
+                InputReader.Instance.OnReleasePressed -= ReleaseLastAsteroid;
             }
+            anchorStats.OnHeadCountChanged -= HandleHeadCountChanged;
         }
 
         private void SetupShipJoint()
@@ -104,20 +99,38 @@ namespace Game.Gameplay.Anchor
 
         public void ReleaseCurrentAsteroid()
         {
-            ReleaseCurrentAsteroidHelper();
+            if (anchoredAsteroid == null) return;
+            anchoredAsteroid.ReleaseAnchor();
+            anchoredAsteroid = null;
+            return;
+        }
+        
+        public void ReleaseLastAsteroid()
+        {
+            ReleaseLastAsteroidHelper();
         }
         
         // 按空格触发，释放锚定的小行星
-        private bool ReleaseCurrentAsteroidHelper()  // Release成功则返回true
+        private bool ReleaseLastAsteroidHelper()  // Release成功则返回true
         {
             // 先尝试Release末尾的Link
-            if (nextLinkAnchor != null && nextLinkAnchor.ReleaseCurrentAsteroidHelper()) return true;
+            if (nextLinkAnchor != null && nextLinkAnchor.ReleaseLastAsteroidHelper()) return true;
             
             // 否则尝试Release自身的
             if (anchoredAsteroid == null) return false;
             anchoredAsteroid.ReleaseAnchor();
             anchoredAsteroid = null;
             return true;
+        }
+
+        private void HandleHeadCountChanged(int targetHeadCount)
+        {
+            while (targetHeadCount > GetAnchorCount()) SpawnNextAnchor();
+        }
+
+        private int GetAnchorCount()
+        {
+            return nextLinkAnchor != null ? 1 + nextLinkAnchor.GetAnchorCount() : 1;
         }
         
         public void SpawnNextAnchor()

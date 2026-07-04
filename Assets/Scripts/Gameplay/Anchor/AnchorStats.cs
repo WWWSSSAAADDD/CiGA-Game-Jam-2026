@@ -40,6 +40,8 @@ namespace Game.Gameplay.Anchor
         public float Mass => mass;
         public float ChainLength => chainLength;
 
+        public event Action<int> OnHeadCountChanged;
+        
         /// <summary>命令：应用一次升级（粉碎商店结算时调用）。内部改完值后自己广播 OnStatsChanged。</summary>
         internal void ApplyUpgrade(AnchorUpgradeType type, float delta)
         {
@@ -58,7 +60,9 @@ namespace Game.Gameplay.Anchor
                     chainLength = Mathf.Max(0.1f, chainLength + delta);
                     break;
                 case AnchorUpgradeType.HeadCount:
+                    int previous = headCount;
                     headCount = Mathf.Max(1, headCount + Mathf.RoundToInt(delta));
+                    if (headCount != previous) OnHeadCountChanged?.Invoke(headCount);
                     break;
             }
         }

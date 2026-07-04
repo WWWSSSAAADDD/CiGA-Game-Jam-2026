@@ -11,7 +11,8 @@ namespace Game.Gameplay.Ship
         Thrust,
         MaxHealth,
         MaxEnergy,
-        Mass
+        Mass,
+        MaxSpeed
     }
 
     /// <summary>
@@ -31,13 +32,13 @@ namespace Game.Gameplay.Ship
         [SerializeField] private float mass = 1f;
         [SerializeField] private float maxEnergy = 100f;
         [SerializeField] private float energy = 100f;
+        [SerializeField] private float maxSpeed = 50f;
 
         public float Health => health;
         public float MaxHealth => maxHealth;
         public float Thrust => thrust;
         public float Mass => mass;
-        public float Energy => energy;
-        public float MaxEnergy => maxEnergy;
+        public float MaxSpeed => maxSpeed;
 
         /// <summary>血量变化通知：(当前血量, 最大血量)。订阅方：UI 模块（HealthBar）。</summary>
         public event Action<float, float> OnHealthChanged;

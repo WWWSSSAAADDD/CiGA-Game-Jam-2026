@@ -22,9 +22,7 @@ namespace Game.Gameplay.Asteroid
 
     /// <summary>
     /// 小行星模块（核心玩法层）。
-    /// 只存硬度/质量/资源类型数量这些数值，暴露 TryAnchor()/ReleaseAnchor() 命令方法和
-    /// GetResourcePayload() 查询方法；外部不直接改内部字段。
-    /// 场上会同时存在很多颗实例，不是单例。
+    /// 职责：任何外部模块与小行星模块交互，都通过AsteroidController接口
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
     public class AsteroidController : MonoBehaviour
@@ -40,6 +38,8 @@ namespace Game.Gameplay.Asteroid
         [FormerlySerializedAs("reanchoredAllowedTime")] 
         [SerializeField] private float reanchoredCooldown = 1;
         
+        private AsteroidAbility asteroidAbility;
+        
         private bool isAnchored;
         private AnchorController anchorController;  // 之前锚定该小行星的船锚
         private float nextAnchorAllowedTime;
@@ -51,6 +51,7 @@ namespace Game.Gameplay.Asteroid
         private void Awake()
         {
             GetComponent<Rigidbody2D>().mass = mass;
+            asteroidAbility = GetComponent<AsteroidAbility>();
         }
         
         public bool TryAnchor(Rigidbody2D anchorRb)
@@ -65,6 +66,7 @@ namespace Game.Gameplay.Asteroid
 
             isAnchored = true;
             anchorController = anchorRb.GetComponent<AnchorController>();
+            asteroidAbility?.HandleAsteroidAnchored();
             return true;
         }
 
@@ -78,13 +80,23 @@ namespace Game.Gameplay.Asteroid
                 Destroy(joint);
 
             isAnchored = false;
+            anchorController = null;
+            asteroidAbility?.HandleAsteroidUnanchored();
             nextAnchorAllowedTime = Time.time + reanchoredCooldown;
             return;
         }
 
+        public void EscapeFromAnchor()
+        {
+            if (anchorController != null)
+            {
+                anchorController.ReleaseCurrentAsteroid();
+            }
+        }
+        
         public void CrushAsteroid()
         {
-            // 更新船锚的状态
+            // 更新当前船锚的状态
             if (anchorController != null)
             {
                 anchorController.ReleaseCurrentAsteroid();
@@ -93,6 +105,8 @@ namespace Game.Gameplay.Asteroid
             // 更新行星的状态
             Destroy(gameObject);
         }
+
+
         
         /// <summary>查询：粉碎这颗小行星能拿到的资源载荷。</summary>
         public ResourcePayload GetResourcePayload()
