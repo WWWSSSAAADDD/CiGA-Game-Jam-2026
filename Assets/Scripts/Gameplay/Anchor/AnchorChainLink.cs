@@ -50,9 +50,9 @@ namespace Game.Gameplay.Anchor
             DistanceJoint2D joint = spawned.AddComponent<DistanceJoint2D>();
             joint.connectedBody = selfRigidbody; // 连到"这一节"，不是飞船
             joint.maxDistanceOnly = true;
-            joint.distance = chainLinkLength;
             joint.enableCollision = false;
-            joint.autoConfigureDistance = false; // 显式关掉自动配置，避免 Unity 用实际生成间距覆盖 chainLinkLength
+            joint.autoConfigureDistance = false; // 必须在设置 distance 之前关闭，否则 Unity 会用实际生成间距覆盖 chainLinkLength
+            joint.distance = chainLinkLength;
 
             nextLink.previousLink = this;
 

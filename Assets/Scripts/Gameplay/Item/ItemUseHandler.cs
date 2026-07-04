@@ -1,10 +1,10 @@
 using Game.Infrastructure;
 using UnityEngine;
 
-namespace Game.Orchestration
+namespace Game.Gameplay.Item
 {
     /// <summary>
-    /// 道具使用模块（编排层）。
+    /// 道具使用模块（核心玩法层）。
     /// 职责：订阅"使用道具"按键，命令背包尝试消耗绑定的道具，消耗成功后触发道具自身的效果。
     /// 不存道具数据本身——那是背包模块的职责，这里只协调"按键 -> 消耗 -> 生效"这一次流程。
     /// </summary>

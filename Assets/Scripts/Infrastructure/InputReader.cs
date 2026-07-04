@@ -21,10 +21,13 @@ namespace Game.Infrastructure
         /// <summary>当前帧的移动输入方向（未归一化，X/Y 各自落在 [-1, 1]）。查询用，只读。</summary>
         public Vector2 MoveInput { get; private set; }
 
-        /// <summary>空格键按下的瞬间触发一次——对应"释放船锚"。订阅方：AnchorRelease。</summary>
+        /// <summary>
+        /// 空格键按下的瞬间触发一次——语义上对应"释放"：不在商店范围内时是纯释放锚（AnchorRelease 订阅）；
+        /// 在商店范围内时改为粉碎结算/销毁（ShopTriggerZone 订阅，且靠 DefaultExecutionOrder 保证它先处理）。
+        /// </summary>
         public event Action OnReleasePressed;
 
-        /// <summary>M 键按下的瞬间触发一次——对应"打开商店"。订阅方：ShopTriggerZone。</summary>
+        /// <summary>M 键按下的瞬间触发一次——对应"打开商店页面"。订阅方：ShopTriggerZone（范围内才生效）。</summary>
         public event Action OnOpenShopPressed;
 
         /// <summary>J 键按下的瞬间触发一次——对应"使用道具"。订阅方：ItemUseHandler。</summary>

@@ -6,12 +6,13 @@ using Game.Gameplay.Ship;
 using Game.Infrastructure;
 using UnityEngine;
 
-namespace Game.Orchestration
+namespace Game.Gameplay.Shop
 {
     /// <summary>
-    /// 粉碎商店模块（编排层）。
+    /// 粉碎商店模块（核心玩法层）。
     /// 职责：把船锚上挂着的小行星依次粉碎、把资源结算进背包；另外提供"用资源购买效果卡"的商店购买逻辑。
-    /// 不是实体本身——它协调的是"小行星、背包、飞船、船锚、效果卡配置表"这几个已有实体之间的业务流程。
+    /// 不是实体本身，但协调的是"小行星、背包、飞船、船锚、效果卡配置表"这几个已有实体之间的业务流程，
+    /// 且被 ShopTriggerZone（编排层）直接命令调用，划入核心玩法层是为了让编排层只留"该不该触发"这一层薄壳。
     /// 单例（逻辑唯一）。
     /// </summary>
     public class CrusherController : MonoBehaviour

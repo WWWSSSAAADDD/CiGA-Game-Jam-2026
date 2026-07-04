@@ -59,9 +59,9 @@ namespace Game.Gameplay.Anchor
             var joint = gameObject.AddComponent<DistanceJoint2D>();
             joint.connectedBody = shipRigidbody;
             joint.maxDistanceOnly = true;
-            joint.distance = stats.ChainLength;
             joint.enableCollision = false;
-            joint.autoConfigureDistance = false;
+            joint.autoConfigureDistance = false; // 必须在设置 distance 之前关闭，否则 Unity 会用当前实际间距覆盖下面的赋值
+            joint.distance = stats.ChainLength;
         }
 
         private void OnCollisionEnter2D(Collision2D collision)
