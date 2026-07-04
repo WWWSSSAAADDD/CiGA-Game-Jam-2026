@@ -1,3 +1,4 @@
+using System;
 using Game.Infrastructure;
 using UnityEngine;
 
@@ -30,12 +31,16 @@ namespace Game.Gameplay.Asteroid
         [Header("物理数值")]
         [SerializeField] private float hardness = 1f;
         [SerializeField] private float mass = 1f;
+        [Tooltip("被释放后，必须等待多少秒才允许再次被船锚锚定。")]
+        [Min(0f)]
+        [SerializeField] private float reanchorCooldown = 0.5f;
 
         [Header("资源")]
         [SerializeField] private ResourceType resourceType;
         [SerializeField] private int resourceAmount = 10;
 
         private bool isAnchored;
+        private float nextAnchorAllowedTime;
 
         public float Hardness => hardness;
         public float Mass => mass;
@@ -53,6 +58,7 @@ namespace Game.Gameplay.Asteroid
         public bool TryAnchor(Rigidbody2D anchorRb)
         {
             if (isAnchored) return false;
+            if (Time.time < nextAnchorAllowedTime) return false;
 
             var joint = gameObject.AddComponent<FixedJoint2D>();
             joint.connectedBody = anchorRb;
@@ -73,6 +79,7 @@ namespace Game.Gameplay.Asteroid
                 Destroy(joint);
 
             isAnchored = false;
+            nextAnchorAllowedTime = Time.time + Mathf.Max(0f, reanchorCooldown);
             return true;
         }
 
