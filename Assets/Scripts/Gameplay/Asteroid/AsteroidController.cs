@@ -1,6 +1,7 @@
 using Game.Gameplay.Anchor;
 using Game.Infrastructure;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Game.Gameplay.Asteroid
 {
@@ -36,7 +37,8 @@ namespace Game.Gameplay.Asteroid
         [SerializeField] private ResourceType resourceType;
         [SerializeField] private int resourceAmount = 10;
 
-        [SerializeField] private float reanchoredAllowedTime = 1;
+        [FormerlySerializedAs("reanchoredAllowedTime")] 
+        [SerializeField] private float reanchoredCooldown = 1;
         
         private bool isAnchored;
         private AnchorController anchorController;  // 之前锚定该小行星的船锚
@@ -76,7 +78,7 @@ namespace Game.Gameplay.Asteroid
                 Destroy(joint);
 
             isAnchored = false;
-            nextAnchorAllowedTime = Time.time + reanchoredAllowedTime;
+            nextAnchorAllowedTime = Time.time + reanchoredCooldown;
             return;
         }
 
