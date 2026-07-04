@@ -1783,6 +1783,7 @@ MonoBehaviour:
   effectCardDatabase: {fileID: 0}
   crushLevel: 1
   shopLevel: 1
+  recrushCooldown: 1000
 --- !u!114 &389306585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5053,7 +5054,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 100
   health: 100
-  thrust: 10
+  thrust: 95.44
   mass: 1
   maxEnergy: 100
   energy: 100
