@@ -163,5 +163,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hardness: 3
   mass: 1
+  reanchorCooldown: 0.5
   resourceType: 0
   resourceAmount: 10
