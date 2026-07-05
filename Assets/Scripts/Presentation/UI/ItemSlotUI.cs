@@ -13,6 +13,7 @@ namespace Game.Presentation.UI
         [SerializeField] private ItemData item;
         [SerializeField] private Image iconImage;
         [SerializeField] private TMP_Text countText;
+        [SerializeField] private TMP_Text itemNameText;
         
         // Start is called before the first frame update
         void Start()
@@ -20,6 +21,7 @@ namespace Game.Presentation.UI
             if (Inventory.Instance != null)
             {
                 Inventory.Instance.OnItemChanged += HandleOnItemChanged;
+                itemNameText.text = item != null ? item.DisplayName : "No Item";
                 Refresh();
             }
             
@@ -27,7 +29,8 @@ namespace Game.Presentation.UI
 
         private void OnDestroy()
         {
-            Inventory.Instance.OnItemChanged -= HandleOnItemChanged;
+            if (Inventory.Instance != null)
+                Inventory.Instance.OnItemChanged -= HandleOnItemChanged;
         }
 
         private void HandleOnItemChanged(ItemData changedItem, int newAmount)

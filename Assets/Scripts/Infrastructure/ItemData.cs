@@ -54,7 +54,7 @@ namespace Game.Infrastructure
         }
     }
 
-    [CreateAssetMenu(fileName = "ItemData", menuName = "锚叠世界/道具数据/加速")]
+    [CreateAssetMenu(fileName = "加速道具", menuName = "锚叠世界/道具数据/加速")]
     public class SpeedUpItem : ItemData
     {
         [FormerlySerializedAs("additionForce")]

@@ -15,9 +15,6 @@ namespace Game.Orchestration
     [RequireComponent(typeof(Collider2D))]
     public class ShopTriggerZone : MonoBehaviour
     {
-        [Header("要结算的船锚")]
-        [Tooltip("Inspector 里拖飞船身上的 AnchorController 进来，玩家销毁时传给 CrusherController.Open()。")]
-        [SerializeField] private AnchorController anchor;
 
         [Header("商店页面 UI")]
         [Tooltip("Inspector 里拖商店页面的根物体（Canvas 下的 ShopPanel）进来。M 键在范围内按下时切换显示/隐藏；" +

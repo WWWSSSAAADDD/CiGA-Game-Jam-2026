@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: "\u52A0\u901F\u9053\u5177"
   m_EditorClassIdentifier: Assembly-CSharp:Game.Infrastructure:SpeedUpItem
-  displayName: speedup
+  displayName: "\u52A0\u901F"
   description: 
   costResourceType: 0
   costAmount: 10
-  additionThrust: 100
+  additionThrust: 20
   totalTime: 10
