@@ -37,7 +37,9 @@ namespace Game.Infrastructure
         public event Action OnOpenShopPressed;
 
         /// <summary>J 键按下的瞬间触发一次——对应"使用道具"。订阅方：ItemUseHandler。</summary>
-        public event Action OnUseItemPressed;
+        public event Action OnJPressed;
+
+        public event Action OnLeftShiftPressed;
 
         private void Awake()
         {
@@ -68,8 +70,10 @@ namespace Game.Infrastructure
                 OnOpenShopPressed?.Invoke();
 
             if (Input.GetKeyDown(KeyCode.J))
-                OnUseItemPressed?.Invoke();
-                
+                OnJPressed?.Invoke();
+
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+                OnLeftShiftPressed?.Invoke();
         }
 
         private void OnDestroy()
