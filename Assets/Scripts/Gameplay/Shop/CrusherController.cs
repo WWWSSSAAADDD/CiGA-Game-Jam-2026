@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Game.Gameplay.Anchor;
 using Game.Gameplay.Asteroid;
 using Game.Gameplay.Ship;
@@ -28,7 +29,7 @@ namespace Game.Gameplay.Shop
         [Header("效果卡配置表")]
         [Tooltip("Inspector 里拖效果卡数据库资产进来，构成商店里能买到的卡片目录。")]
         [SerializeField] private EffectCardDatabase effectCardDatabase;
-        
+
         /// <summary>通知：完成一次粉碎结算。订阅方：小行星生成模块（用来推进难度曲线）。</summary>
         public event Action OnCrushCompleted;
 
@@ -70,6 +71,12 @@ namespace Game.Gameplay.Shop
             return Inventory.Instance.GetResourceAmount(card.CostResourceType) >= card.CostAmount;
         }
 
+        public bool CanAfford(ItemData item)
+        {
+            if (item == null || Inventory.Instance == null) return false;
+            return Inventory.Instance.GetResourceAmount(item.CostResourceType) >= item.CostAmount;
+        }
+        
         /// <summary>
         /// 命令：尝试购买一张效果卡——买得起就扣掉对应资源、应用卡片效果；买不起什么都不做。
         /// 调用方：商店购买界面（点击"购买"按钮）。
@@ -80,6 +87,15 @@ namespace Game.Gameplay.Shop
 
             Inventory.Instance.AddResource(card.CostResourceType, -card.CostAmount);
             ApplyEffectCard(card);
+            return true;
+        }
+
+        public bool TryBuyItem(ItemData item)
+        {
+            if (!CanAfford(item)) return false;
+            
+            Inventory.Instance.AddResource(item.CostResourceType, -item.CostAmount);
+            Inventory.Instance.AddItem(item, 1);
             return true;
         }
 

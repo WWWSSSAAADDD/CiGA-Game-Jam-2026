@@ -6,6 +6,12 @@ using UnityEngine.UI;
 
 namespace Game.Presentation.UI
 {
+    enum ShopSlotType
+    {
+        Card,
+        Item
+    }
+    
     /// <summary>
     /// 商店卡片槽位（表现层）。
     /// 职责：显示一张效果卡的效果/花费，点击购买按钮时命令 CrusherController 尝试购买；
@@ -21,9 +27,14 @@ namespace Game.Presentation.UI
     /// </summary>
     public class ShopCardSlotUI : MonoBehaviour
     {
+        [SerializeField] private ShopSlotType shopSlotType;
+        
         [Tooltip("Inspector 里拖这个槽位对应的效果卡资产（Assets 里用 Create > 锚叠世界 > 效果卡数据 创建）。")]
         [SerializeField] private EffectCardData card;
 
+        [Tooltip("item和card选择一个进行售卖")]
+        [SerializeField] private ItemData item;
+        
         [Header("展示与交互控件")]
         [SerializeField] private TextMeshProUGUI effectText;
         [SerializeField] private TextMeshProUGUI costText;
@@ -58,29 +69,54 @@ namespace Game.Presentation.UI
 
         private void HandleBuyClicked()
         {
-            if (card == null || CrusherController.Instance == null) return;
+            if (shopSlotType == ShopSlotType.Card)
+            {
+                if (card == null || CrusherController.Instance == null) return;
 
-            CrusherController.Instance.TryBuyCard(card);
-            // 买成功会触发 Inventory.OnResourceChanged，上面订阅的 HandleResourceChanged 自己会刷新按钮状态，
-            // 这里不需要重复刷新；买不起时 TryBuyCard 内部什么都不会改，也就不会有事件，按钮状态本来就正确。
+                CrusherController.Instance.TryBuyCard(card);
+                // 买成功会触发 Inventory.OnResourceChanged，上面订阅的 HandleResourceChanged 自己会刷新按钮状态，
+                // 这里不需要重复刷新；买不起时 TryBuyCard 内部什么都不会改，也就不会有事件，按钮状态本来就正确。
+            }
+            else if (shopSlotType == ShopSlotType.Item)
+            {
+                if (item == null || CrusherController.Instance == null) return;
+                CrusherController.Instance.TryBuyItem(item);
+            }
         }
 
-        private void RefreshLabels()
+        private void RefreshLabels()  
         {
-            if (card == null) return;
-
-            if (effectText != null)
-                effectText.text = $"{card.StatType} {(card.Delta >= 0 ? "+" : string.Empty)}{card.Delta:0.#}";
-
-            if (costText != null)
-                costText.text = $"{card.CostResourceType} x{card.CostAmount}";
+            if (shopSlotType == ShopSlotType.Card)
+            {
+                if (card == null) return;
+                if (effectText != null)
+                    effectText.text = $"{card.StatType} {(card.Delta >= 0 ? "+" : string.Empty)}{card.Delta:0.#}";
+                if (costText != null)
+                    costText.text = $"{card.CostResourceType} x{card.CostAmount}";
+            }
+            else if (shopSlotType == ShopSlotType.Item)
+            {
+                if (item == null) return;
+                if (effectText != null)
+                    effectText.text = item.DisplayName;
+                if (costText != null)
+                    costText.text = $"{item.CostResourceType} x{item.CostAmount}";
+            }
         }
 
         private void RefreshInteractable()
         {
-            if (buyButton == null || card == null) return;
-
-            buyButton.interactable = CrusherController.Instance != null && CrusherController.Instance.CanAfford(card);
+            if (shopSlotType == ShopSlotType.Card)
+            {
+                if (buyButton == null || card == null) return;
+                buyButton.interactable = CrusherController.Instance != null && CrusherController.Instance.CanAfford(card);
+            }
+            else if (shopSlotType == ShopSlotType.Item)
+            {
+                if (buyButton == null || item == null) return;
+                buyButton.interactable = CrusherController.Instance != null && CrusherController.Instance.CanAfford(item);
+                
+            }
         }
     }
 }

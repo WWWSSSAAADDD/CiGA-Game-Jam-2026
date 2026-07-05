@@ -16,10 +16,19 @@ namespace Game.Infrastructure
         [Header("基本信息")]
         [SerializeField] private string displayName;
         [SerializeField, TextArea] private string description;
-
+        
+        [Header("购买成本")]
+        [Tooltip("购买这个道具需要消耗哪种资源。")]
+        [SerializeField] private ResourceType costResourceType;
+        [Tooltip("购买这张卡需要消耗多少数量。")]
+        [Min(0)]
+        [SerializeField] private int costAmount;
         public string DisplayName => displayName;
         public string Description => description;
-
+        
+        public ResourceType CostResourceType => costResourceType;
+        public int CostAmount => costAmount;
+        
         /// <summary>
         /// 占位：使用这件道具触发的效果。当前是空实现——效果系统是未来工作，
         /// ItemUseHandler 已经按"背包消耗成功才调用"接好了这个方法，以后实现效果时只需要填这里。

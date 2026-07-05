@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: "\u5411\u524D\u7A81\u8FDB\u9053\u5177"
   m_EditorClassIdentifier: Assembly-CSharp:Game.Infrastructure:ImpulseItem
-  displayName: 
+  displayName: "\u7A81\u8FDB\u9053\u5177"
   description: 
+  costResourceType: 0
+  costAmount: 10
   force: 50
