@@ -11,7 +11,7 @@ namespace Game.Infrastructure
     /// 单例（逻辑唯一）。
     /// 通信方式：
     ///   - <see cref="MoveInput"/> 被查询（例如 ShipController 在 FixedUpdate 里读）。
-    ///   - 三个按键事件各自被订阅（例如 AnchorRelease / ShopTriggerZone / ItemUseHandler）。
+    ///   - 各按键事件各自被订阅（例如 AnchorChainController / ShopTriggerZone / ItemUseHandler）。
     /// 场景里只应该挂一份（建议挂在一个常驻的 Bootstrap/Managers 物体上）。
     /// </summary>
     public class InputReader : MonoBehaviour
@@ -22,10 +22,16 @@ namespace Game.Infrastructure
         public Vector2 MoveInput { get; private set; }
 
         /// <summary>
-        /// 空格键按下的瞬间触发一次——语义上对应"释放"：不在商店范围内时是纯释放锚（AnchorRelease 订阅）；
-        /// 在商店范围内时改为粉碎结算/销毁（ShopTriggerZone 订阅，且靠 DefaultExecutionOrder 保证它先处理）。
+        /// 空格键（不按 Shift）按下的瞬间触发一次——语义上对应"释放最新一节"：不在商店范围内时是纯释放锚，
+        /// 在商店范围内时改为粉碎结算/销毁。订阅方：AnchorChainController（链条头一节，整条链唯一的协调者）。
         /// </summary>
         public event Action OnReleasePressed;
+
+        /// <summary>
+        /// Shift+空格按下的瞬间触发一次——语义上对应"从最新一节开始，整条链依次全部释放"。
+        /// 订阅方：AnchorChainController。
+        /// </summary>
+        public event Action OnReleaseAllPressed;
 
         /// <summary>M 键按下的瞬间触发一次——对应"打开商店页面"。订阅方：ShopTriggerZone（范围内才生效）。</summary>
         public event Action OnOpenShopPressed;
@@ -50,13 +56,20 @@ namespace Game.Infrastructure
             MoveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
             if (Input.GetKeyDown(KeyCode.Space))
-                OnReleasePressed?.Invoke();
+            {
+                bool shiftHeld = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+                if (shiftHeld)
+                    OnReleaseAllPressed?.Invoke();
+                else
+                    OnReleasePressed?.Invoke();
+            }
 
             if (Input.GetKeyDown(KeyCode.M))
                 OnOpenShopPressed?.Invoke();
 
             if (Input.GetKeyDown(KeyCode.J))
                 OnUseItemPressed?.Invoke();
+                
         }
 
         private void OnDestroy()

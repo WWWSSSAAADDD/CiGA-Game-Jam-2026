@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5cc4098cb4af61408d08b0d2dccd30f, type: 3}
+  m_Name: MsfxLib
+  m_EditorClassIdentifier: 
+  audioClips:
+  - {fileID: 8300000, guid: c59951dac2233d3488e47e7f51dc471d, type: 3}
+  - {fileID: 8300000, guid: 831386a196d66f24fb03ce6ec238db4b, type: 3}
+  - {fileID: 8300000, guid: 0d624599603fe424686c3ba53dfd51e7, type: 3}
+  - {fileID: 8300000, guid: 73517314da1f57f4185573cc9e9e4a78, type: 3}

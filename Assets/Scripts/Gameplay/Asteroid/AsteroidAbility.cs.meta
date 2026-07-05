@@ -1,5 +1,9 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:Assets/Scripts/Gameplay/Anchor/AnchorChainController.cs.meta
+guid: b8ef793f50e0a264d9679f542b636936
+========
 guid: ac5a206ac99d2cb42a4e17cbc8344618
+>>>>>>>> origin/重构:Assets/Scripts/Gameplay/Asteroid/AsteroidAbility.cs.meta
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
