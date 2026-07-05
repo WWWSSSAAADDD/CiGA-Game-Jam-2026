@@ -14,13 +14,7 @@ namespace Game.Gameplay.Ship
         Mass,
         MaxSpeed
     }
-
-    /// <summary>
-    /// 飞船模块 —— 数值部分（核心玩法层）。
-    /// 只存数值（血量/推力/能源/质量），暴露 <see cref="ApplyDamage"/>/<see cref="ApplyUpgrade"/> 命令方法；
-    /// 内部改完值后自己触发通知。不写任何物理/输入逻辑——那是 ShipController/ShipDamage 的职责
-    /// （XxxController + XxxStats 拆分模式）。
-    /// </summary>
+    
     public class ShipStats : MonoBehaviour
     {
         [Header("血量")]
@@ -43,6 +37,9 @@ namespace Game.Gameplay.Ship
         /// <summary>血量变化通知：(当前血量, 最大血量)。订阅方：UI 模块（HealthBar）。</summary>
         public event Action<float, float> OnHealthChanged;
 
+        
+        public event Action OnDied;
+        
         /// <summary>数值变化通知（升级生效后）。订阅方：任何需要感知飞船数值变化的模块。</summary>
         public event Action OnStatsChanged;
 
@@ -58,6 +55,8 @@ namespace Game.Gameplay.Ship
 
             health = Mathf.Clamp(health - amount, 0f, maxHealth);
             OnHealthChanged?.Invoke(health, maxHealth);
+            
+            if (health <= 0f) OnDied?.Invoke();
         }
 
         /// <summary>命令：应用一次升级（粉碎商店升级飞船时时调用）。内部改完值后自己广播 OnStatsChanged。</summary>
