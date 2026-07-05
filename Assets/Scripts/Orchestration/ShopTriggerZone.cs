@@ -57,7 +57,7 @@ namespace Game.Orchestration
                 // 飞船离开商店范围时也不关闭商店UI页面
             }
 
-            if (other.TryGetComponent(out AsteroidController asteroidController))
+            if (other.TryGetComponent(out AsteroidController asteroidController) && CrusherController.Instance != null)
             {
                 CrusherController.Instance.TryCrushAsteroid(asteroidController);
             }

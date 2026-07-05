@@ -87,7 +87,7 @@ namespace Game.Gameplay.Asteroid
             {
                 Vector2 dir = UnityEngine.Random.insideUnitCircle.normalized;
                 float force = Random.Range(maoDieForce - maoDiefluctuationRange, maoDieForce + maoDiefluctuationRange);
-                shipRb.AddForce(dir * force, ForceMode2D.Force);
+                shipRb.AddForce(dir * force, ForceMode2D.Impulse);
                 nextAbilityAllowedTime = Time.time + abilityCd;
             }
         }

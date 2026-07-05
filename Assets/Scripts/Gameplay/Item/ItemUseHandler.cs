@@ -1,3 +1,5 @@
+using System;
+using Game.Gameplay.Ship;
 using Game.Infrastructure;
 using UnityEngine;
 
@@ -13,12 +15,18 @@ namespace Game.Gameplay.Item
         [Tooltip("Inspector 里拖要绑定到 J 键的道具资产进来。单件道具槽位，够用 jam 的 MVP 范围。")]
         [SerializeField] private ItemData boundItem;
 
+        [SerializeField] private int initialCount = 10;
+        
+        [SerializeField] private ShipController targetShip;
+        
         private void Start()
         {
             // 用 Start（而不是 OnEnable）订阅跨物体的单例事件：Unity 不保证不同物体的 Awake 先后顺序，
             // 但保证所有物体的 Awake 都执行完之后才会开始跑任何一个 Start，这里才能确定 InputReader.Instance 已就绪。
             if (InputReader.Instance != null)
                 InputReader.Instance.OnUseItemPressed += HandleUseItemPressed;
+            if (Inventory.Instance != null)
+                Inventory.Instance.AddItem(boundItem,  initialCount);
         }
 
         private void OnDestroy()
@@ -33,7 +41,8 @@ namespace Game.Gameplay.Item
             if (Inventory.Instance == null) return;
 
             if (Inventory.Instance.TryConsumeItem(boundItem))
-                boundItem.Use();
+                boundItem.Use(targetShip);
         }
     }
 }
+    
