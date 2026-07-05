@@ -36,7 +36,9 @@ namespace Game.Infrastructure
         [Tooltip("购买这张卡需要消耗多少数量。")]
         [Min(0)]
         [SerializeField] private int costAmount;
-
+        [Header("升级卡名称")]
+        [SerializeField] private string displayName;
+        
         [Header("效果")]
         [Tooltip("这张卡具体调整哪一项数值。")]
         [SerializeField] private EffectStatType statType;
@@ -47,5 +49,6 @@ namespace Game.Infrastructure
         public int CostAmount => costAmount;
         public EffectStatType StatType => statType;
         public float Delta => delta;
+        public string  DisplayName => displayName;
     }
 }

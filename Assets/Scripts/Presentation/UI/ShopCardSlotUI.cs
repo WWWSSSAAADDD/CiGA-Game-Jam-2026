@@ -90,7 +90,7 @@ namespace Game.Presentation.UI
             {
                 if (card == null) return;
                 if (effectText != null)
-                    effectText.text = $"{card.StatType} {(card.Delta >= 0 ? "+" : string.Empty)}{card.Delta:0.#}";
+                    effectText.text = card.DisplayName;
                 if (costText != null)
                     costText.text = $"{card.CostResourceType} x{card.CostAmount}";
             }

@@ -46,7 +46,6 @@ namespace Game.Presentation.UI
             if (countText == null || iconImage == null || Inventory.Instance == null) return;
             int count = Inventory.Instance.GetItemCount(item);
             countText.text = count.ToString();
-            iconImage.enabled = count > 0;
         }
     }
 }

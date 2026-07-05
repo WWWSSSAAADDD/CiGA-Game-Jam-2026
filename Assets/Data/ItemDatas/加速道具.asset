@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 0}
   m_Name: "\u52A0\u901F\u9053\u5177"
   m_EditorClassIdentifier: Assembly-CSharp:Game.Infrastructure:SpeedUpItem
-  displayName: "\u52A0\u901F"
+  displayName: "\u52A0\u901F\u9053\u5177"
   description: 
   costResourceType: 0
   costAmount: 10

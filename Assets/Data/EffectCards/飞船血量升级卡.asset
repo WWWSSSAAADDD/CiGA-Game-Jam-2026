@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   costResourceType: 0
   costAmount: 10
+  displayName: "\u98DE\u8239\u8840\u91CF+100"
   statType: 1
   delta: 100
