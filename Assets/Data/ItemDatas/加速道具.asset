@@ -16,5 +16,5 @@ MonoBehaviour:
   description: 
   costResourceType: 0
   costAmount: 10
-  additionThrust: 20
+  additionThrust: 100
   totalTime: 10

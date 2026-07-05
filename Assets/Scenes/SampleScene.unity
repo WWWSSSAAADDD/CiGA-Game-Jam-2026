@@ -1097,8 +1097,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae4b159b84407bc489e65d11f6a9fcb4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boundItem: {fileID: 11400000, guid: 2b6e6de00789c934f9400f40f8022e02, type: 2}
-  initialCount: 3
+  itemUsedByJ: {fileID: 11400000, guid: 2b6e6de00789c934f9400f40f8022e02, type: 2}
+  itemUsedByLeftShift: {fileID: 11400000, guid: 103d636ad82cfbd438142874c82d1e68, type: 2}
+  initialCount: 1
   targetShip: {fileID: 2112421380}
 --- !u!4 &306475375
 Transform:
@@ -1606,6 +1607,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 225854603970208555, guid: 4007c84a6b3fb7948b0d37d8ba226a3a, type: 3}
+      propertyPath: maxSpeed
+      value: 30
+      objectReference: {fileID: 0}
     - target: {fileID: 1627448346585277161, guid: 4007c84a6b3fb7948b0d37d8ba226a3a, type: 3}
       propertyPath: anchor
       value: 
