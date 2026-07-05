@@ -13,6 +13,7 @@ namespace Game.Orchestration
     {
         [Header("生成对象与范围")]
         [SerializeField] private GameObject asteroidPrefab;
+        public skinLib skins;
         [SerializeField] private Vector2 spawnAreaMin = new Vector2(-10f, -10f);
         [SerializeField] private Vector2 spawnAreaMax = new Vector2(10f, 10f);
 
@@ -65,6 +66,7 @@ namespace Game.Orchestration
                 Random.Range(spawnAreaMin.y, spawnAreaMax.y));
 
             GameObject instance = Instantiate(asteroidPrefab, position, Quaternion.identity);
+            instance.GetComponent<SpriteRenderer>().sprite = skins.sprites[Random.Range(0, skins.sprites.Count)];
             spawned.Add(instance);
         }
     }
