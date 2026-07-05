@@ -8,6 +8,8 @@ public class CrusherAnimation : MonoBehaviour
     public AudioClip aimClip;
     private void OnEnable()
     {
+        this.transform.localPosition = Vector3.zero;
+        this.transform.GetChild(0).localPosition = new Vector3(0.141f, 0, 0);
         if (BGMManager.instance != null)
         {
             BGMManager.instance.SFXplay(aimClip);
