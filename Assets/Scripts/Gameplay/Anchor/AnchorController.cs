@@ -23,6 +23,8 @@ namespace Game.Gameplay.Anchor
         private AsteroidController anchoredAsteroid;
         private bool isFirstAnchor = true;
         public void setIsFirstAnchor(bool value) { isFirstAnchor = value; }
+
+        public event Action OnAnchorAsteroid;
         
         public Rigidbody2D AnchorRigidbody => anchorRigidbody;
         public AsteroidController AnchoredAsteroid => anchoredAsteroid;
@@ -94,6 +96,7 @@ namespace Game.Gameplay.Anchor
             if (asteroid.TryAnchor(anchorRigidbody))
             {
                 anchoredAsteroid = asteroid;
+                OnAnchorAsteroid?.Invoke();
             }
         }
 
