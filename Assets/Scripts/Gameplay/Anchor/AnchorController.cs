@@ -25,7 +25,9 @@ namespace Game.Gameplay.Anchor
         public void setIsFirstAnchor(bool value) { isFirstAnchor = value; }
 
         public event Action OnAnchorAsteroid;
-        
+
+        public AudioClip clip;
+
         public Rigidbody2D AnchorRigidbody => anchorRigidbody;
         public AsteroidController AnchoredAsteroid => anchoredAsteroid;
 
@@ -40,7 +42,7 @@ namespace Game.Gameplay.Anchor
                 return res;
             }
         }
-        
+
         private void Awake()
         {
             anchorRigidbody = GetComponent<Rigidbody2D>();
@@ -97,6 +99,7 @@ namespace Game.Gameplay.Anchor
             {
                 anchoredAsteroid = asteroid;
                 OnAnchorAsteroid?.Invoke();
+                BGMManager.instance.SFXplay(clip);
             }
         }
 
@@ -107,18 +110,18 @@ namespace Game.Gameplay.Anchor
             anchoredAsteroid = null;
             return;
         }
-        
+
         public void ReleaseLastAsteroid()
         {
             ReleaseLastAsteroidHelper();
         }
-        
+
         // 按空格触发，释放锚定的小行星
         private bool ReleaseLastAsteroidHelper()  // Release成功则返回true
         {
             // 先尝试Release末尾的Link
             if (nextLinkAnchor != null && nextLinkAnchor.ReleaseLastAsteroidHelper()) return true;
-            
+
             // 否则尝试Release自身的
             if (anchoredAsteroid == null) return false;
             anchoredAsteroid.ReleaseAnchor();
@@ -135,7 +138,7 @@ namespace Game.Gameplay.Anchor
         {
             return nextLinkAnchor != null ? 1 + nextLinkAnchor.GetAnchorCount() : 1;
         }
-        
+
         public void SpawnNextAnchor()
         {
             if (nextLinkAnchor != null) nextLinkAnchor.SpawnNextAnchor();

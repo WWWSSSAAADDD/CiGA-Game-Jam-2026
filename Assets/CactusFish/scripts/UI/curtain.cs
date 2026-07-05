@@ -12,6 +12,8 @@ public class curtain : MonoBehaviour
     float t;
     private void Start()
     {
+
+
         if (Instance == null)
         {
             Instance = this;
@@ -37,6 +39,7 @@ public class curtain : MonoBehaviour
                 t = 0;
                 isOpen = false;
                 isOpen2 = true;
+
             }
         }
         if (isOpen2)
@@ -49,6 +52,11 @@ public class curtain : MonoBehaviour
                 t = 0;
                 this.GetComponent<CanvasGroup>().blocksRaycasts = false;
                 this.GetComponent<CanvasGroup>().interactable = false;
+                Time.timeScale = 1.0f;
+                if (BGMManager.instance.bgm.clip != BGMManager.instance.bgmLib.audioClips[0])
+                {
+                    BGMManager.instance.BGMplay(BGMManager.instance.bgmLib.audioClips[0]);
+                }
                 isOpen2 = false;
             }
         }
