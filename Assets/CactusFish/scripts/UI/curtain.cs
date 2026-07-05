@@ -32,7 +32,7 @@ public class curtain : MonoBehaviour
             this.GetComponent<CanvasGroup>().interactable = true;
             if (this.GetComponent<CanvasGroup>().alpha == 1)
             {
-                //SceneManager.LoadScene(str);
+                SceneManager.LoadScene(str);
                 this.GetComponent<CanvasGroup>().alpha = 1;
                 t = 0;
                 isOpen = false;

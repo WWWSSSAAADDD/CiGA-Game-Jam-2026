@@ -304,7 +304,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: shuisuitianqu_test
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &61475330
@@ -1296,6 +1296,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 742cde5a540dcca47a0b1e3b1d25c06b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isOpen: 0
+  str: 
 --- !u!1 &451486490
 GameObject:
   m_ObjectHideFlags: 0

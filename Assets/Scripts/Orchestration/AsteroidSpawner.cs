@@ -36,14 +36,14 @@ namespace Game.Orchestration
         {
             // 用 Start（而不是 OnEnable）订阅跨物体的单例事件：Unity 不保证不同物体的 Awake 先后顺序，
             // 但保证所有物体的 Awake 都执行完之后才会开始跑任何一个 Start，这里才能确定 CrusherController.Instance 已就绪。
-            if (CrusherController.Instance != null)
-                CrusherController.Instance.OnCrushCompleted += HandleCrushCompleted;
+            //if (CrusherController.Instance != null)
+            //CrusherController.Instance.OnCrushCompleted += HandleCrushCompleted;
         }
 
         private void OnDestroy()
         {
-            if (CrusherController.Instance != null)
-                CrusherController.Instance.OnCrushCompleted -= HandleCrushCompleted;
+            //if (CrusherController.Instance != null)
+            //CrusherController.Instance.OnCrushCompleted -= HandleCrushCompleted;
         }
 
         private void HandleCrushCompleted()

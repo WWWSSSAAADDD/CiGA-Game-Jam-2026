@@ -33,7 +33,7 @@ namespace Game.Orchestration
 
         // 挂这个脚本的 Collider2D 需要在 Inspector 里勾上 isTrigger，否则 OnTriggerEnter2D/Exit2D 不会触发。
         private bool shipInRange;
-        
+
         private void Start()
         {
             // 用 Start（而不是 OnEnable）订阅跨物体的单例事件：Unity 不保证不同物体的 Awake 先后顺序，
@@ -58,6 +58,7 @@ namespace Game.Orchestration
 
             if (other.TryGetComponent(out AsteroidController asteroid))
             {
+
                 CrusherController.Instance?.CrushWithoutShip(asteroid);
             }
         }
