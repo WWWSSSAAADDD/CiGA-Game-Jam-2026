@@ -1,3 +1,4 @@
+using System.Collections;
 using Game.Gameplay.Anchor;
 using Game.Infrastructure;
 using UnityEngine;
@@ -68,6 +69,18 @@ namespace Game.Gameplay.Ship
         public void ApplyUpgrade(ShipUpgradeType type, float delta)
         {
             stats.ApplyUpgrade(type, delta);
+        }
+
+        public void AddTemporaryThrust(float delta, float duration)
+        {
+            StartCoroutine(TemporaryThrustRoutine(delta, duration));
+        }
+
+        private IEnumerator TemporaryThrustRoutine(float amout, float duration)
+        {
+            ApplyUpgrade(ShipUpgradeType.Thrust, amout);
+            yield return new WaitForSeconds(duration);
+            ApplyUpgrade(ShipUpgradeType.Thrust, -amout);
         }
     }
 }

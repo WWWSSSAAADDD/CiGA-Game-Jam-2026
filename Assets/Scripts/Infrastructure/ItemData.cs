@@ -1,5 +1,7 @@
 using Game.Gameplay.Ship;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Game.Infrastructure
 {
@@ -38,7 +40,7 @@ namespace Game.Infrastructure
         }
     }
 
-    [CreateAssetMenu(fileName = "ItemData", menuName = "锚叠世界/道具数据/向前突进")]
+    [CreateAssetMenu(fileName = "突进道具", menuName = "锚叠世界/道具数据/向前突进")]
     public class ImpulseItem : ItemData
     {
         [SerializeField] private float force = 50;
@@ -49,6 +51,21 @@ namespace Game.Infrastructure
                 Vector2 dir = InputReader.Instance.MoveInput.normalized;
                 rb.AddForce(dir * force, ForceMode2D.Impulse);
             }
+        }
+    }
+
+    [CreateAssetMenu(fileName = "ItemData", menuName = "锚叠世界/道具数据/加速")]
+    public class SpeedUpItem : ItemData
+    {
+        [FormerlySerializedAs("additionForce")]
+        [Header("增加的推力")]
+        [SerializeField] private float additionThrust = 10;
+        [Header("持续时间")]
+        [SerializeField] private float totalTime = 10;
+        
+        public override void Use(ShipController shipController)
+        {
+            shipController.AddTemporaryThrust(additionThrust, totalTime);
         }
     }
 }
