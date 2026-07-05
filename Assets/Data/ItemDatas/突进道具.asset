@@ -15,5 +15,5 @@ MonoBehaviour:
   displayName: "\u7A81\u8FDB\u9053\u5177"
   description: 
   costResourceType: 0
-  costAmount: 10
+  costAmount: 5
   force: 50
