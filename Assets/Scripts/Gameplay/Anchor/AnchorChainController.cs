@@ -39,7 +39,7 @@ namespace Game.Gameplay.Anchor
             firstAnchor = GetComponent<AnchorController>();
             anchors.Add(firstAnchor);
             tipLink = GetComponent<AnchorChainLink>();
-            
+
             firstAnchor.GetComponent<AnchorStats>().OnHeadCountChanged += HandleAnchorHeadChanged;
         }
 
@@ -95,51 +95,12 @@ namespace Game.Gameplay.Anchor
         {
             for (int i = 0; i < delta; i++) AppendAnchor();
         }
-        
+
         // 新的一节不能生成在当前链尾的正上方——两者之间没有拉力、也关掉了碰撞，会完全重叠到有外力拽开为止。
         // 沿着"上一节 -> 链尾"的方向往外延伸一个链节长度，让新锚一出生就自然排在链条延长线上；
         // 链尾就是链条头（没有上一节）时退化成固定方向。
-        private Vector2 ComputeNextSpawnPosition()
-        {
-            Vector2 tipPosition = tipLink.transform.position;
-            AnchorChainLink previous = tipLink.PreviousLink;
 
-            Vector2 direction = previous != null
-                ? tipPosition - (Vector2)previous.transform.position
-                : Vector2.down;
 
-            if (direction.sqrMagnitude < 0.0001f)
-                direction = Vector2.down;
 
-            return tipPosition + direction.normalized * tipLink.ChainLinkLength;
-        }
-
-        /// <summary>空格键：只处理链条最新一节（后进先出）。</summary>
-        private void HandleReleasePressed()
-        {
-            if (anchors.Count == 0) return;
-            for (int i = anchors.Count - 1; i >= 0; i--)
-            {
-                if (ReleaseOrCrush(anchors[i])) return;
-            }
-        }
-
-        /// <summary>Shift+空格键：从最新一节开始，整条链依次全部处理。</summary>
-        private void HandleReleaseAllPressed()
-        {
-            for (int i = anchors.Count - 1; i >= 0; i--)
-                ReleaseOrCrush(anchors[i]);
-        }
-
-        // 在商店范围内时命令粉碎商店结算（含资源、内部会再命令释放）；不在范围内就是纯释放。
-        // CrusherController.CrushWithShip() 签名未变——多锚只是把"传进去哪个 AnchorController"这件事
-        // 从"Inspector 里固定的一个"变成"链条当前要处理的这一节"。
-        private bool ReleaseOrCrush(AnchorController target)
-        {
-            if (shipInRange && CrusherController.Instance)
-                return CrusherController.Instance.CrushWithShip(target);
-            else
-                return target.ReleaseCurrentAsteroid();
-        }
     }
 }
