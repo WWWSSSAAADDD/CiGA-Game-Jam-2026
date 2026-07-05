@@ -7,7 +7,7 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private GameObject gameOverUI;
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip gameOverSfx;
-    
+
     private bool isGameOver;
 
     private void Awake()
@@ -21,13 +21,13 @@ public class GameOverManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (shipStats != null) 
+        if (shipStats != null)
             shipStats.OnDied += HandlePlayerDied;
     }
 
     private void OnDestroy()
     {
-        if (shipStats != null) 
+        if (shipStats != null)
             shipStats.OnDied -= HandlePlayerDied;
     }
 
@@ -35,11 +35,13 @@ public class GameOverManager : MonoBehaviour
     {
         if (isGameOver) return;
         isGameOver = true;
-        
+
         if (gameOverUI != null)
             gameOverUI.SetActive(true);
-        if (audioSource != null &&  gameOverSfx != null)
-            audioSource.PlayOneShot(gameOverSfx);
-        Time.timeScale = 0f;
+
+        BGMManager.instance.BGMplay(BGMManager.instance.bgmLib.audioClips[1]);
+        BGMManager.instance.SFXplay(gameOverSfx);
+
+        //Time.timeScale = 0f;
     }
 }
