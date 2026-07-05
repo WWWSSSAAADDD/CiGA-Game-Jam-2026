@@ -28,32 +28,19 @@ namespace Game.Orchestration
         [Tooltip("每完成一定次数粉碎，maxAliveCount 增加 1。")]
         [SerializeField] private int crushesPerExtraAliveCount = 5;
 
-        private int crushCount;
         private float timer;
         private readonly List<GameObject> spawned = new List<GameObject>();
 
         private void Start()
         {
-            // 用 Start（而不是 OnEnable）订阅跨物体的单例事件：Unity 不保证不同物体的 Awake 先后顺序，
-            // 但保证所有物体的 Awake 都执行完之后才会开始跑任何一个 Start，这里才能确定 CrusherController.Instance 已就绪。
-            //if (CrusherController.Instance != null)
-            //CrusherController.Instance.OnCrushCompleted += HandleCrushCompleted;
+            if (CrusherController.Instance != null) ;
+            // CrusherController.Instance.OnCrushCompleted += HandleCrushCompleted;
         }
 
         private void OnDestroy()
         {
-            //if (CrusherController.Instance != null)
-            //CrusherController.Instance.OnCrushCompleted -= HandleCrushCompleted;
-        }
-
-        private void HandleCrushCompleted()
-        {
-            crushCount++;
-
-            spawnInterval = Mathf.Max(minSpawnInterval, spawnInterval - intervalReductionPerCrush);
-
-            if (crushesPerExtraAliveCount > 0 && crushCount % crushesPerExtraAliveCount == 0)
-                maxAliveCount++;
+            if (CrusherController.Instance != null) ;
+            // CrusherController.Instance.OnCrushCompleted -= HandleCrushCompleted;
         }
 
         private void Update()

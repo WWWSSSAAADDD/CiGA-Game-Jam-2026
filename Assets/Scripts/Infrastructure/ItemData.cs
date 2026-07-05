@@ -1,3 +1,4 @@
+using Game.Gameplay.Ship;
 using UnityEngine;
 
 namespace Game.Infrastructure
@@ -23,8 +24,22 @@ namespace Game.Infrastructure
         /// 占位：使用这件道具触发的效果。当前是空实现——效果系统是未来工作，
         /// ItemUseHandler 已经按"背包消耗成功才调用"接好了这个方法，以后实现效果时只需要填这里。
         /// </summary>
-        public virtual void Use()
+        public virtual void Use(ShipController shipController)
         {
+        }
+    }
+
+    [CreateAssetMenu(fileName = "ItemData", menuName = "锚叠世界/道具数据/向前突进")]
+    public class ImpulseItem : ItemData
+    {
+        [SerializeField] private float force = 50;
+        public override void Use(ShipController shipController)
+        {
+            if (shipController.TryGetComponent(out Rigidbody2D rb))
+            {
+                Vector2 dir = InputReader.Instance.MoveInput.normalized;
+                rb.AddForce(dir * force, ForceMode2D.Impulse);
+            }
         }
     }
 }

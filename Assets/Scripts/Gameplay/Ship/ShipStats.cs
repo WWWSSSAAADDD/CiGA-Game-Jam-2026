@@ -33,13 +33,11 @@ namespace Game.Gameplay.Ship
         [SerializeField] private float maxEnergy = 100f;
         [SerializeField] private float energy = 100f;
         [SerializeField] private float maxSpeed = 50f;
-        
+
         public float Health => health;
         public float MaxHealth => maxHealth;
         public float Thrust => thrust;
         public float Mass => mass;
-        public float Energy => energy;
-        public float MaxEnergy => maxEnergy;
         public float MaxSpeed => maxSpeed;
 
         /// <summary>血量变化通知：(当前血量, 最大血量)。订阅方：UI 模块（HealthBar）。</summary>
@@ -63,7 +61,7 @@ namespace Game.Gameplay.Ship
         }
 
         /// <summary>命令：应用一次升级（粉碎商店升级飞船时时调用）。内部改完值后自己广播 OnStatsChanged。</summary>
-        public void ApplyUpgrade(ShipUpgradeType type, float delta)
+        internal void ApplyUpgrade(ShipUpgradeType type, float delta)
         {
             switch (type)
             {
@@ -83,9 +81,6 @@ namespace Game.Gameplay.Ship
                     break;
                 case ShipUpgradeType.Mass:
                     mass = Mathf.Max(0.01f, mass + delta);
-                    break;
-                case ShipUpgradeType.MaxSpeed:
-                    maxSpeed = Mathf.Max(0f, maxSpeed + delta);
                     break;
             }
 

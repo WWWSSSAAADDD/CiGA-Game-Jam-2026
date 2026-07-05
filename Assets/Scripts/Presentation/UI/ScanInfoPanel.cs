@@ -28,8 +28,9 @@ namespace Game.Presentation.UI
             // （道理同 HealthBar：不依赖 AnchorController 所在物体的 Awake 是否已经跑过）。
             if (anchor != null)
             {
-                anchor.OnAsteroidAnchored += HandleAsteroidAnchored;
-                anchor.OnAsteroidReleased += HandleAsteroidReleased;
+                // TODO:在这里添加新的委托
+                // anchor.OnAsteroidAnchored += HandleAsteroidAnchored;
+                // anchor.OnAsteroidReleased += HandleAsteroidReleased;
 
                 // 面板可能在锚已经带着小行星之后才被启用（比如某个 UI 层整体开关），
                 // 这里主动查一次当前状态，而不是无条件假设"刚启用=空载"。
@@ -47,8 +48,9 @@ namespace Game.Presentation.UI
         {
             if (anchor != null)
             {
-                anchor.OnAsteroidAnchored -= HandleAsteroidAnchored;
-                anchor.OnAsteroidReleased -= HandleAsteroidReleased;
+                // TODO:在这里添加新的委托
+                //anchor.OnAsteroidAnchored -= HandleAsteroidAnchored;
+                //anchor.OnAsteroidReleased -= HandleAsteroidReleased;
             }
         }
 

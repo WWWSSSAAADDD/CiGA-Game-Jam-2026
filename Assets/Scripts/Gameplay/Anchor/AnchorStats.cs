@@ -30,9 +30,6 @@ namespace Game.Gameplay.Anchor
 
         [Header("物理数值")]
         [SerializeField] private float mass = 1f;
-        // 只用于 AnchorController.SetupShipJoint()——链条头一节连船那根 DistanceJoint2D 的长度。
-        // 链条内部"这一节到下一节"的间距是 AnchorChainLink.ChainLinkLength，两者故意不共用同一个数值，
-        // 升级"船锚链长度"效果卡目前只会改到这里，不会影响已有/新生的链节间距。
         [SerializeField] private float chainLength = 5f;
 
         [Header("多锚（船锚串联用，P2 才会用到）")]
@@ -42,14 +39,11 @@ namespace Game.Gameplay.Anchor
         public float MinAnchorSpeed => minAnchorSpeed;
         public float Mass => mass;
         public float ChainLength => chainLength;
-        public int HeadCount => headCount;
 
-        /// <summary>数值变化通知（升级生效后）。订阅方：任何需要感知船锚数值变化的模块。</summary>
-        public event Action OnStatsChanged;
         public event Action<int> OnHeadCountChanged;
         
         /// <summary>命令：应用一次升级（粉碎商店结算时调用）。内部改完值后自己广播 OnStatsChanged。</summary>
-        public void ApplyUpgrade(AnchorUpgradeType type, float delta)
+        internal void ApplyUpgrade(AnchorUpgradeType type, float delta)
         {
             switch (type)
             {
@@ -66,16 +60,11 @@ namespace Game.Gameplay.Anchor
                     chainLength = Mathf.Max(0.1f, chainLength + delta);
                     break;
                 case AnchorUpgradeType.HeadCount:
-                    int previousHeadCount = headCount;
+                    int previous = headCount;
                     headCount = Mathf.Max(1, headCount + Mathf.RoundToInt(delta));
-
-                    int headCountDelta = headCount - previousHeadCount;
-                    if (headCountDelta > 0)
-                        OnHeadCountChanged?.Invoke(headCountDelta);
+                    if (headCount != previous) OnHeadCountChanged?.Invoke(headCount);
                     break;
             }
-
-            OnStatsChanged?.Invoke();
         }
     }
 }

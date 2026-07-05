@@ -19,7 +19,7 @@ namespace Game.Gameplay.Anchor
     public class AnchorChainLink : MonoBehaviour
     {
         [Header("串联下一节要用到的预制体")]
-        [Tooltip("Inspector 里拖锚的预制体进来（应同时挂了 AnchorController/AnchorStats/AnchorChainLink）。")]
+        [Tooltip("Inspector 里拖锚的预制体进来（应同时挂了 AnchorController/AnchorStats/AnchorRelease/AnchorChainLink）。")]
         [SerializeField] private GameObject anchorPrefab;
         [Tooltip("Inspector 里拖链条视觉的预制体进来（挂了 RopeVisual）。")]
         [SerializeField] private GameObject ropeVisualPrefab;
@@ -27,42 +27,16 @@ namespace Game.Gameplay.Anchor
         [SerializeField] private float chainLinkLength = 2f;
 
         private Rigidbody2D selfRigidbody;
-        private AnchorChainLink previousLink;
-
-        /// <summary>查询：上一节链条；链条头一节（直接连船的那一节）没有上一节，值为 null。</summary>
-        public AnchorChainLink PreviousLink => previousLink;
-
-        /// <summary>查询：新生成的一节到这一节之间的最大距离。调用方：AnchorChainController，
-        /// 用来在追加新锚时把生成位置往外偏移，避免和这一节完全重叠。</summary>
-        public float ChainLinkLength => chainLinkLength;
-
+        
         private void Awake()
         {
             selfRigidbody = GetComponent<Rigidbody2D>();
         }
-
-        /// <summary>
-        /// 命令：在链条末端动态生成下一节新锚，并创建这一节到下一节之间的绳子视觉。
-        /// 调用方：AnchorChainController.AppendAnchor()——只有链条当前的"最新一节"会被调用这个方法，
-        /// 避免链上每一节各自响应触发，生出分叉的链条。
-        /// 没有配置 anchorPrefab 时返回 null（防御性检查，调用方按空值处理即可）。
-        /// </summary>
-        public AnchorChainLink SpawnNextLink(Vector2 spawnPosition)
+        
+        internal AnchorController SpawnNextAnchor(Vector2 spawnPosition)
         {
-            if (anchorPrefab == null)
-            {
-                Debug.LogWarning($"{nameof(AnchorChainLink)} 没有指定 {nameof(anchorPrefab)}，无法生成下一节船锚。");
-                return null;
-            }
-
             GameObject spawned = Instantiate(anchorPrefab, spawnPosition, Quaternion.identity);
             AnchorChainLink nextLink = spawned.GetComponent<AnchorChainLink>();
-            if (nextLink == null)
-            {
-                Debug.LogWarning($"{nameof(AnchorChainLink)} 的 {nameof(anchorPrefab)} 没有挂 {nameof(AnchorChainLink)} 组件，无法接入链条。");
-                Destroy(spawned);
-                return null;
-            }
 
             DistanceJoint2D joint = spawned.AddComponent<DistanceJoint2D>();
             joint.connectedBody = selfRigidbody; // 连到"这一节"，不是飞船
@@ -70,22 +44,16 @@ namespace Game.Gameplay.Anchor
             joint.enableCollision = false;
             joint.autoConfigureDistance = false; // 必须在设置 distance 之前关闭，否则 Unity 会用实际生成间距覆盖 chainLinkLength
             joint.distance = chainLinkLength;
-
-            nextLink.previousLink = this;
+            
 
             // 这一段绳子视觉的生命周期跟这一节锚绑在一起，谁创建谁负责设两个端点。
-            if (ropeVisualPrefab != null)
-            {
-                RopeVisual rope = Instantiate(ropeVisualPrefab).GetComponent<RopeVisual>();
-                rope.PointA = transform;
-                rope.PointB = nextLink.transform;
-            }
-            else
-            {
-                Debug.LogWarning($"{nameof(AnchorChainLink)} 没有指定 {nameof(ropeVisualPrefab)}，新链条不会显示绳子视觉。");
-            }
+            RopeVisual rope = Instantiate(ropeVisualPrefab).GetComponent<RopeVisual>();
+            rope.PointA = transform;
+            rope.PointB = nextLink.transform;
 
-            return nextLink;
+            AnchorController  anchorController = spawned.GetComponent<AnchorController>();
+            anchorController.setIsFirstAnchor(false);
+            return anchorController;
         }
     }
 }
