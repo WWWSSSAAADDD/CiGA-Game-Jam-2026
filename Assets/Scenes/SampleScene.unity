@@ -3624,7 +3624,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shipStats: {fileID: 1196068891}
-  gameOverUI: {fileID: 0}
+  gameOverUI: {fileID: 1095739425}
   audioSource: {fileID: 0}
   gameOverSfx: {fileID: 0}
 --- !u!1 &1647842903
