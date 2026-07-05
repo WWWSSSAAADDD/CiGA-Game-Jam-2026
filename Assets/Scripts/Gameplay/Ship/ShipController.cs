@@ -79,8 +79,10 @@ namespace Game.Gameplay.Ship
         private IEnumerator TemporaryThrustRoutine(float amout, float duration)
         {
             ApplyUpgrade(ShipUpgradeType.Thrust, amout);
+            ApplyUpgrade(ShipUpgradeType.MaxSpeed, stats.MaxSpeed);
             yield return new WaitForSeconds(duration);
             ApplyUpgrade(ShipUpgradeType.Thrust, -amout);
+            ApplyUpgrade(ShipUpgradeType.MaxSpeed, -stats.MaxSpeed);
         }
     }
 }
