@@ -116,7 +116,7 @@ namespace Game.Gameplay.Asteroid
             {
                 Vector2 dir = UnityEngine.Random.insideUnitCircle.normalized;
                 float force = Random.Range(daGouForce - daGoufluctuationRange, daGouForce + daGoufluctuationRange);
-                asteroidRb.AddForce(dir * force, ForceMode2D.Force);
+                asteroidRb.AddForce(dir * force, ForceMode2D.Impulse);
                 nextAbilityAllowedTime = Time.time + abilityCd;
             }
         }
