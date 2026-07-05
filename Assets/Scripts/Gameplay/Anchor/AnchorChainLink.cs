@@ -24,7 +24,7 @@ namespace Game.Gameplay.Anchor
         [Tooltip("Inspector 里拖链条视觉的预制体进来（挂了 RopeVisual）。")]
         [SerializeField] private GameObject ropeVisualPrefab;
         [Tooltip("新生成的一节到这一节之间的最大距离。")]
-        [SerializeField] private float chainLinkLength = 2f;
+        [SerializeField] private float chainLinkLength = 4f;
 
         private Rigidbody2D selfRigidbody;
         

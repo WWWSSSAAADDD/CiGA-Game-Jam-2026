@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: "\u8239\u951A\u6570\u91CF\u5347\u7EA7\u5361"
   m_EditorClassIdentifier: 
   costResourceType: 0
-  costAmount: 0
+  costAmount: 1
   statType: 8
   delta: 1
