@@ -12,7 +12,7 @@ namespace Game.Orchestration
     public class AsteroidSpawner : MonoBehaviour
     {
         [Header("生成对象与范围")]
-        [SerializeField] private GameObject asteroidPrefab;
+        [SerializeField] private GameObject[] asteroidPrefabs;
         public skinLib skins;
         [SerializeField] private Vector2 spawnAreaMin = new Vector2(-10f, -10f);
         [SerializeField] private Vector2 spawnAreaMax = new Vector2(10f, 10f);
@@ -59,12 +59,13 @@ namespace Game.Orchestration
 
         private void SpawnOne()
         {
-            if (asteroidPrefab == null) return;
+            if (asteroidPrefabs == null || asteroidPrefabs.Length == 0) return;
 
             Vector2 position = new Vector2(
                 Random.Range(spawnAreaMin.x, spawnAreaMax.x),
                 Random.Range(spawnAreaMin.y, spawnAreaMax.y));
-
+            
+            GameObject asteroidPrefab = asteroidPrefabs[Random.Range(0, asteroidPrefabs.Length)];
             GameObject instance = Instantiate(asteroidPrefab, position, Quaternion.identity);
             instance.GetComponent<SpriteRenderer>().sprite = skins.sprites[Random.Range(0, skins.sprites.Count)];
             spawned.Add(instance);
